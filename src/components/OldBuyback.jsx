@@ -162,7 +162,7 @@ const OldBuyback = ({ buybacks = [], onAddBuyback, onDeleteBuyback }) => {
                   <th>Date & Item Name</th>
                   <th style={{ textAlign: 'right' }}>Weight</th>
                   <th style={{ textAlign: 'right' }}>Paid Amount</th>
-                  <th>Notes</th>
+                  <th className="hide-mobile">Notes</th>
                   <th></th>
                 </tr>
               </thead>
@@ -174,12 +174,17 @@ const OldBuyback = ({ buybacks = [], onAddBuyback, onDeleteBuyback }) => {
                       <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>
                         {new Date(b.date).toLocaleString('en-IN')}
                       </div>
+                      {b.detail && (
+                        <div className="show-mobile" style={{ fontSize: 11, color: 'var(--gold)', marginTop: '2px', display: 'none' }}>
+                          Note: {b.detail}
+                        </div>
+                      )}
                     </td>
                     <td style={{ textAlign: 'right', fontWeight: 600 }}>{b.weight}g</td>
                     <td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--gold)' }}>
                       ₹{b.amount?.toLocaleString('en-IN')}
                     </td>
-                    <td style={{ fontSize: 12, color: 'var(--text-sub)' }}>{b.detail || '—'}</td>
+                    <td className="hide-mobile" style={{ fontSize: 12, color: 'var(--text-sub)' }}>{b.detail || '—'}</td>
                     <td style={{ textAlign: 'right' }}>
                       <button 
                         className="btn btn-danger-ghost" 
