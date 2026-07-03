@@ -11,6 +11,7 @@ import AuditPage      from './components/AuditPage'
 import SoldItems      from './components/SoldItems'
 import StockDashboard from './components/StockDashboard'
 import { supabase }   from './supabaseClient'
+import OldBuyback     from './components/OldBuyback'
 
 export default function App() {
   // ── Auth ───────────────────────────────────────────────────────────────────
@@ -24,6 +25,7 @@ export default function App() {
   const [products, setProducts]   = useState([])
   const [soldItems, setSoldItems] = useState([])
   const [ledger, setLedger]       = useState([])
+  const [buybacks, setBuybacks]   = useState([])
 
   // Lookup Tables for Category/Subcategory/Variant mappings
   const [dbCategories, setDbCategories] = useState([])
@@ -132,6 +134,24 @@ export default function App() {
     if (ledgerList) {
       setLedger(ledgerList)
     }
+
+    // 5. Fetch buybacks (Old gold/silver purchases)
+    const { data: buybackList } = await supabase
+      .from('purchases')
+      .select('*')
+      .eq('supplier_name', 'Old Gold/Silver Buyback')
+      .order('date', { ascending: false })
+
+    if (buybackList) {
+      setBuybacks(buybackList.map(item => ({
+        id: item.id,
+        date: item.date,
+        itemName: item.variant,
+        weight: parseFloat(item.weight || 0),
+        amount: parseFloat(item.amount || 0),
+        detail: item.detail || ''
+      })))
+    }
   }
 
   // ── Realtime Postgres Subscriptions ───────────────────────────────────────
@@ -145,6 +165,7 @@ export default function App() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'stock_entries' }, () => { loadData() })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'ledger' }, () => { loadData() })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'sales' }, () => { loadData() })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'purchases' }, () => { loadData() })
       .subscribe()
 
     return () => {
@@ -158,11 +179,18 @@ export default function App() {
     localStorage.setItem('tas_theme', 'light')
   }, [])
 
-  // Redirect auditor user away from forbidden tabs
+  // Redirect non-admin users away from admin-only tabs
   useEffect(() => {
-    const forbiddenTabs = ['dashboard', 'sold', 'reports']
-    if (user && user.role === 'auditor' && forbiddenTabs.includes(activeTab)) {
-      setActiveTab('stock')
+    if (user) {
+      const adminOnlyTabs = ['reports', 'old_buyback']
+      if (user.role !== 'admin' && adminOnlyTabs.includes(activeTab)) {
+        setActiveTab('stock')
+      }
+      
+      const auditorForbiddenTabs = ['dashboard', 'sold', 'reports', 'old_buyback']
+      if (user.role === 'auditor' && auditorForbiddenTabs.includes(activeTab)) {
+        setActiveTab('stock')
+      }
     }
   }, [user, activeTab])
 
@@ -273,6 +301,26 @@ export default function App() {
     if (error) console.error("Error updating product:", error)
   }
 
+  const addBuyback = async (buyback) => {
+    const { error } = await supabase.from('purchases').insert({
+      supplier_name: 'Old Gold/Silver Buyback',
+      category: 'Old Item',
+      variant: buyback.itemName,
+      weight: buyback.weight,
+      quantity: 1,
+      rate: buyback.weight > 0 ? (buyback.amount / buyback.weight) : 0,
+      amount: buyback.amount,
+      detail: buyback.detail || '',
+      date: buyback.date
+    })
+    if (error) throw error
+  }
+
+  const deleteBuyback = async (id) => {
+    const { error } = await supabase.from('purchases').delete().eq('id', id)
+    if (error) console.error("Error deleting buyback:", error)
+  }
+
   // ── Sales (Process sale, deduct stock, log history) ───────────────────────
   const processSale = async (customerName, mobile, cartItems) => {
     const billId = `TAS-${Date.now()}`
@@ -367,9 +415,10 @@ export default function App() {
     stock:     <StockDashboard products={products}   onDelete={deleteProduct} role={user?.role} />,
     add:       <AddStock       onAddProduct={addProduct} />,
     sell:      <SellDashboard  products={products}   processSale={processSale} />,
-    sold:      <SoldItems      soldItems={soldItems} />,
-    audit:     <AuditPage      products={products}   soldItems={soldItems} ledger={ledger} />,
-    reports:   <Reports        products={products}   soldItems={soldItems} role={user?.role} deleteProduct={deleteProduct} />
+    sold:        <SoldItems      soldItems={soldItems} />,
+    old_buyback: <OldBuyback     buybacks={buybacks}   onAddBuyback={addBuyback} onDeleteBuyback={deleteBuyback} />,
+    audit:       <AuditPage      products={products}   soldItems={soldItems} ledger={ledger} />,
+    reports:     <Reports        products={products}   soldItems={soldItems} role={user?.role} deleteProduct={deleteProduct} />
   }
 
   const currentPage = pages[activeTab] || pages.dashboard
