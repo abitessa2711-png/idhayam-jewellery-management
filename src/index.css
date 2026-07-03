@@ -959,3 +959,13 @@ td { color: var(--text-main); }
     width: 100% !important;
   }
 }
+
+/* Stock Select Badges Styling */
+.stock-select-badge:hover {
+  background: rgba(197, 160, 94, 0.15) !important;
+  border-color: var(--gold) !important;
+  transform: translateY(-1px);
+}
+.stock-select-badge:active {
+  transform: translateY(0);
+}

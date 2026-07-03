@@ -15,6 +15,7 @@ const SellDashboard = ({ products = [], processSale }) => {
   const [showBill, setShowBill] = useState(null)
   const [lastBill, setLastBill] = useState(null)
   const [selectedStockId, setSelectedStockId] = useState('')
+  const [weightSearch, setWeightSearch] = useState('')
 
   const getSubs = () => formData.category ? Object.keys(MASTER_DATA[formData.category]) : []
   const getVariants = () => {
@@ -23,15 +24,40 @@ const SellDashboard = ({ products = [], processSale }) => {
     return Array.isArray(d) ? d : (typeof d === 'object' ? Object.keys(d) : [])
   }
 
-  // Derived: All stock entries matching the selected variant
-  const matchingStocks = products.filter(p => 
-    p.category === formData.category && 
-    p.subcategory === formData.subcategory && 
-    p.variant === formData.variant &&
-    (p.weight > 0 || (p.quantity && p.quantity > 0))
-  )
+  // Helper to determine product category emoji for premium look
+  const getCategoryEmoji = (cat) => {
+    if (cat?.toLowerCase().includes('gold') || cat?.toLowerCase().includes('தங்கம்')) return '🟡'
+    if (cat?.toLowerCase().includes('silver') || cat?.toLowerCase().includes('வெள்ளி')) return '⚪'
+    return '📦'
+  }
+
+  // Derived: Filter products based on selected dropdown hierarchy.
+  // If no category/subcategory/variant is selected, we include all available stocks.
+  const matchingStocks = products.filter(p => {
+    if (formData.category && p.category !== formData.category) return false
+    if (formData.subcategory && p.subcategory !== formData.subcategory) return false
+    if (formData.variant && p.variant !== formData.variant) return false
+    return p.weight > 0 || (p.quantity && p.quantity > 0)
+  })
+
+  const filteredStocks = matchingStocks.filter(s => {
+    if (!weightSearch) return true;
+    const searchVal = weightSearch.trim().toLowerCase();
+    return s.weight.toString().includes(searchVal) || 
+           s.weight.toFixed(3).includes(searchVal) || 
+           (s.detail && s.detail.toLowerCase().includes(searchVal)) ||
+           s.id.toString() === searchVal;
+  });
 
   const availableStock = products.find(p => p.id === parseInt(selectedStockId))
+
+  const handleReset = () => {
+    setFormData({
+      category: '', subcategory: '', variant: '', detail: '', weight: '', quantity: '', rate: '', discountAmt: '', gstAmt: ''
+    })
+    setSelectedStockId('')
+    setWeightSearch('')
+  }
 
   const weight = parseFloat(formData.weight || 0)
   const rate = parseFloat(formData.rate || 0)
@@ -86,6 +112,7 @@ const SellDashboard = ({ products = [], processSale }) => {
     // Reset selection part
     setFormData({ ...formData, weight: '', quantity: '', rate: '', discountAmt: '' })
     setSelectedStockId('')
+    setWeightSearch('')
   }
 
   const handleSale = async () => {
@@ -128,13 +155,24 @@ const SellDashboard = ({ products = [], processSale }) => {
       <div className="sell-layout-grid">
         {/* Sale Form */}
         <div className="card">
-          <div className="card-title">பொருள் தேர்வு (Item Selection)</div>
+          <div className="flex-between mb-12">
+            <div className="card-title" style={{ margin: 0 }}>பொருள் தேர்வு (Item Selection)</div>
+            <button 
+              type="button" 
+              className="btn btn-secondary" 
+              style={{ fontSize: '11px', padding: '4px 8px', height: 'auto' }}
+              onClick={handleReset}
+            >
+              Reset Filters / Clear
+            </button>
+          </div>
           <div className="form-grid form-grid-2col">
             <div className="form-group">
               <label>பிரிவு (Category)</label>
               <select value={formData.category} onChange={e => {
                 setFormData({ ...formData, category: e.target.value, subcategory: '', variant: '', detail: '' })
                 setSelectedStockId('')
+                setWeightSearch('')
               }}>
                 <option value="">— Select —</option>
                 {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -145,6 +183,7 @@ const SellDashboard = ({ products = [], processSale }) => {
               <select value={formData.subcategory} onChange={e => {
                 setFormData({ ...formData, subcategory: e.target.value, variant: '', detail: '' })
                 setSelectedStockId('')
+                setWeightSearch('')
               }} disabled={!formData.category}>
                 <option value="">— Select —</option>
                 {getSubs().map(s => <option key={s} value={s}>{s}</option>)}
@@ -155,11 +194,46 @@ const SellDashboard = ({ products = [], processSale }) => {
               <select value={formData.variant} onChange={e => {
                 setFormData({ ...formData, variant: e.target.value, detail: '' })
                 setSelectedStockId('')
+                setWeightSearch('')
               }} disabled={!formData.subcategory}>
                 <option value="">— Select —</option>
                 {getVariants().map(v => <option key={v} value={v}>{v}</option>)}
               </select>
             </div>
+
+            {matchingStocks.length > 0 && (
+              <div className="form-group grid-span-2">
+                <label>இருப்புத் தேடல் (எடை/விவரம்/ID மூலம் தேட) / Search Stock (by Weight/Detail/ID)</label>
+                <input 
+                  type="text" 
+                  placeholder="எடை, விவரம் அல்லது ID-ஐ தட்டச்சு செய்யவும்..." 
+                  value={weightSearch} 
+                  onChange={e => {
+                    const val = e.target.value;
+                    setWeightSearch(val);
+                    const matches = matchingStocks.filter(s => 
+                      s.weight.toString().includes(val) || 
+                      s.weight.toFixed(3).includes(val) ||
+                      (s.detail && s.detail.toLowerCase().includes(val.toLowerCase())) ||
+                      s.id.toString() === val
+                    );
+                    if (matches.length === 1) {
+                      const s = matches[0];
+                      setSelectedStockId(s.id.toString());
+                      setFormData({ 
+                        ...formData, 
+                        category: s.category,
+                        subcategory: s.subcategory,
+                        variant: s.variant,
+                        detail: s.detail, 
+                        weight: s.weight.toString(), 
+                        quantity: "1" 
+                      });
+                    }
+                  }}
+                />
+              </div>
+            )}
 
             <div className="form-group grid-span-2">
               <label>இருப்புத் தெரிவு (Select Specific Stock) <span style={{ color: 'red' }}>*</span></label>
@@ -167,16 +241,95 @@ const SellDashboard = ({ products = [], processSale }) => {
                 const id = e.target.value;
                 setSelectedStockId(id);
                 const s = products.find(p => p.id === parseInt(id));
-                if (s) setFormData({ ...formData, detail: s.detail, weight: s.weight.toString(), quantity: "1" });
+                if (s) {
+                  setFormData({ 
+                    ...formData, 
+                    category: s.category,
+                    subcategory: s.subcategory,
+                    variant: s.variant,
+                    detail: s.detail, 
+                    weight: s.weight.toString(), 
+                    quantity: "1" 
+                  });
+                }
               }} disabled={matchingStocks.length === 0}>
                 <option value="">— {matchingStocks.length > 0 ? 'Select Stock Entry' : 'No Stock Available'} —</option>
-                {matchingStocks.map(s => (
+                {filteredStocks.slice(0, 100).map(s => (
                   <option key={s.id} value={s.id}>
-                    ID: {s.id} | {s.detail || 'No Detail'} | {s.quantity} pcs | {s.weight}g | {new Date(s.createdAt).toLocaleDateString()}
+                    ID: {s.id} | {getCategoryEmoji(s.category)} {s.category} {' > '} {s.subcategory} {' > '} {s.variant} | {s.detail || 'No Detail'} | {s.quantity} pcs | {s.weight}g
                   </option>
                 ))}
               </select>
             </div>
+
+            {matchingStocks.length > 0 && (
+              <div className="grid-span-2" style={{ marginTop: '-4px', marginBottom: '8px' }}>
+                <label style={{ fontSize: '12px', color: 'var(--text-sub)', marginBottom: '6px' }}>
+                  இருப்பில் உள்ள பொருட்கள் (Available Items - Click to select):
+                </label>
+                <div style={{ 
+                  display: 'flex', 
+                  flexWrap: 'wrap', 
+                  gap: '8px', 
+                  maxHeight: '150px', 
+                  overflowY: 'auto', 
+                  padding: '8px', 
+                  background: 'rgba(255,255,255,0.02)', 
+                  border: '1px solid var(--border)', 
+                  borderRadius: '10px' 
+                }}>
+                  {filteredStocks.slice(0, 50).map(s => {
+                    const isSelected = selectedStockId === s.id.toString();
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedStockId(s.id.toString());
+                          setFormData({ 
+                            ...formData, 
+                            category: s.category,
+                            subcategory: s.subcategory,
+                            variant: s.variant,
+                            detail: s.detail, 
+                            weight: s.weight.toString(), 
+                            quantity: "1" 
+                          });
+                        }}
+                        style={{
+                          background: isSelected ? 'rgba(197, 160, 94, 0.2)' : 'rgba(255, 255, 255, 0.03)',
+                          border: isSelected ? '1px solid var(--gold)' : '1px solid var(--border)',
+                          color: isSelected ? 'var(--gold)' : 'var(--text-main)',
+                          padding: '4px 10px',
+                          borderRadius: '6px',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          transition: 'all 0.15s ease',
+                          fontWeight: isSelected ? 600 : 500
+                        }}
+                        className="stock-select-badge"
+                      >
+                        <span style={{ color: isSelected ? 'var(--gold)' : 'var(--text-sub)', fontSize: '10px' }}>#{s.id}</span>
+                        <span>{getCategoryEmoji(s.category)} {s.variant || s.subcategory || s.category}: {s.weight}g</span>
+                        {s.quantity > 1 && <span style={{ opacity: 0.8 }}>({s.quantity} pcs)</span>}
+                        {s.detail && <span style={{ opacity: 0.6, fontSize: '11px' }}>- {s.detail}</span>}
+                      </button>
+                    );
+                  })}
+                  {filteredStocks.length > 50 && (
+                    <div style={{ width: '100%', color: 'var(--text-sub)', fontSize: '11px', textAlign: 'center', marginTop: '4px' }}>
+                      மேலும் {filteredStocks.length - 50} பொருட்கள் உள்ளன, எடையை இன்னும் தெளிவாக தட்டச்சு செய்யவும் (Type more digits to filter)
+                    </div>
+                  )}
+                  {filteredStocks.length === 0 && (
+                    <div style={{ color: 'var(--text-sub)', fontSize: '12px', padding: '4px' }}>பொருந்தும் இருப்புகள் எதுவும் இல்லை (No matching stocks)</div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {availableStock && (
               <div className="grid-span-2" style={{ marginTop: '-8px', marginBottom: '8px', fontSize: '13px', background: 'rgba(255,255,255,0.03)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
