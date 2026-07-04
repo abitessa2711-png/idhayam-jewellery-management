@@ -16,6 +16,9 @@ const SellDashboard = ({ products = [], processSale }) => {
   const [lastBill, setLastBill] = useState(null)
   const [selectedStockId, setSelectedStockId] = useState('')
   const [weightSearch, setWeightSearch] = useState('')
+  const [saleDate, setSaleDate] = useState(() => {
+    return new Date().toLocaleString('sv-SE').slice(0, 16).replace(' ', 'T')
+  })
 
   const getSubs = () => formData.category ? Object.keys(MASTER_DATA[formData.category]) : []
   const getVariants = () => {
@@ -119,11 +122,13 @@ const SellDashboard = ({ products = [], processSale }) => {
     if (!cart.length) return
     setLoading(true)
     try {
-      const bill = await processSale(customer.name || 'Walk-in', customer.mobile, cart)
+      const selectedIsoDate = new Date(saleDate).toISOString()
+      const bill = await processSale(customer.name || 'Walk-in', customer.mobile, cart, selectedIsoDate)
       setShowBill(bill)
       setLastBill(bill)
       setCart([])
       setCustomer({ name: '', mobile: '' })
+      setSaleDate(new Date().toLocaleString('sv-SE').slice(0, 16).replace(' ', 'T'))
     } catch (err) {
       alert('விற்பனை பிழை: ' + err.message)
     } finally {
@@ -418,6 +423,16 @@ const SellDashboard = ({ products = [], processSale }) => {
               <label>மொபைல்</label>
               <input type="text" placeholder="Mobile" value={customer.mobile} onChange={e => setCustomer({ ...customer, mobile: e.target.value })} />
             </div>
+          </div>
+
+          <div className="form-group mb-16">
+            <label>விற்பனை தேதி (Sale Date & Time) *</label>
+            <input 
+              type="datetime-local" 
+              value={saleDate} 
+              onChange={e => setSaleDate(e.target.value)} 
+              required
+            />
           </div>
 
           <div style={{ minHeight: '200px', border: '1px solid var(--border)', borderRadius: 10, padding: '10px', background: 'rgba(0,0,0,0.01)', overflowY: 'auto', marginBottom: '15px' }}>

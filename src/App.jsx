@@ -322,9 +322,9 @@ export default function App() {
   }
 
   // ── Sales (Process sale, deduct stock, log history) ───────────────────────
-  const processSale = async (customerName, mobile, cartItems) => {
+  const processSale = async (customerName, mobile, cartItems, customDate) => {
     const billId = `TAS-${Date.now()}`
-    const date = new Date().toISOString()
+    const date = customDate || new Date().toISOString()
 
     for (const item of cartItems) {
       // 1. Fetch current stock entry to ensure it exists and has sufficient balance
@@ -363,7 +363,8 @@ export default function App() {
           variant_id: stock.variant_id,
           weight: item.weight,
           quantity: item.quantity,
-          detail: item.detail || ''
+          detail: item.detail || '',
+          created_at: date
         })
       if (salesEntryErr) throw salesEntryErr
 
@@ -375,7 +376,8 @@ export default function App() {
           category_name: item.category,
           subcategory_name: item.subcategory || null,
           variant_name: item.variant || null,
-          weight: item.weight
+          weight: item.weight,
+          created_at: date
         })
       if (ledgerErr) throw ledgerErr
 

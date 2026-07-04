@@ -1,7 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Package, Activity } from 'lucide-react'
 
 const AuditPage = ({ products = [], soldItems = [], ledger = [] }) => {
+  const [auditedIds, setAuditedIds] = useState(() => {
+    const saved = localStorage.getItem('manually_audited_ledger_ids')
+    return saved ? new Set(JSON.parse(saved)) : new Set()
+  })
+
+  const toggleAuditStatus = (id) => {
+    const newSet = new Set(auditedIds)
+    if (newSet.has(id)) {
+      newSet.delete(id)
+    } else {
+      newSet.add(id)
+    }
+    setAuditedIds(newSet)
+    localStorage.setItem('manually_audited_ledger_ids', JSON.stringify([...newSet]))
+  }
+
   const totalQuantity = (products || []).reduce((sum, p) => sum + (parseInt(p.quantity, 10) || 0), 0)
   const totalSold = (soldItems || []).reduce((sum, s) => sum + (parseInt(s.quantity, 10) || 0), 0)
 
@@ -101,12 +117,18 @@ const AuditPage = ({ products = [], soldItems = [], ledger = [] }) => {
                 <tr>
                   <th>பொருள் விவரம்</th>
                   <th style={{ textAlign: 'right' }}>எடை (g)</th>
+                  <th className="hide-mobile" style={{ textAlign: 'center' }}>நிலை (Status)</th>
                   <th className="hide-mobile" style={{ textAlign: 'right' }}>தேதி</th>
                 </tr>
               </thead>
               <tbody>
                 {addedItems.map(item => {
                   const isSold = matchedAddIds.has(item.id)
+                  const isAuditEntry = item.variant_name === 'மாற்று இருப்பு' || 
+                                       item.detail?.includes('மாற்று இருப்பு') || 
+                                       item.category_name === 'மற்றவை'
+                  const isAudited = auditedIds.has(item.id)
+
                   return (
                     <tr key={item.id} className="table-row" style={isSold ? { opacity: 0.85 } : {}}>
                       <td>
@@ -116,6 +138,22 @@ const AuditPage = ({ products = [], soldItems = [], ledger = [] }) => {
                         <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>
                           {item.category_name} {item.subcategory_name ? `· ${item.subcategory_name}` : ''}
                         </div>
+                        
+                        {/* Mobile view badge */}
+                        <div className="show-mobile" style={{ display: 'none', marginTop: '6px' }}>
+                          {isAuditEntry ? (
+                            <span style={{ padding: '2px 6px', borderRadius: '4px', fontSize: '10px', background: 'rgba(231, 76, 60, 0.15)', color: '#E74C3C', fontWeight: 600 }}>⚙️ தணிக்கை</span>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => toggleAuditStatus(item.id)}
+                              style={{ border: 'none', background: isAudited ? 'rgba(46, 204, 113, 0.15)' : 'rgba(212, 175, 55, 0.15)', color: isAudited ? '#2ECC71' : 'var(--gold)', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: 600, cursor: 'pointer' }}
+                            >
+                              {isAudited ? '✅ தணிக்கை' : '👤 நிர்வாகி'}
+                            </button>
+                          )}
+                        </div>
+
                         <div className="show-mobile" style={{ fontSize: 11, color: 'var(--text-sub)', marginTop: '4px' }}>
                           தேதி: {new Date(item.created_at).toLocaleDateString('en-IN')}
                         </div>
@@ -126,6 +164,22 @@ const AuditPage = ({ products = [], soldItems = [], ledger = [] }) => {
                           <span style={{ fontSize: 9, fontWeight: 500, display: 'block', color: '#EF4444', marginTop: '2px' }}>
                             (விற்பனை செய்யப்பட்டது)
                           </span>
+                        )}
+                      </td>
+                      <td className="hide-mobile" style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                        {isAuditEntry ? (
+                          <span style={{ padding: '4px 8px', borderRadius: '6px', fontSize: '11px', background: 'rgba(231, 76, 60, 0.15)', color: '#E74C3C', fontWeight: 600 }} title="தணிக்கை திருத்தம் (Audit Entry)">
+                            ⚙️ தணிக்கை (Audit)
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => toggleAuditStatus(item.id)}
+                            style={{ border: 'none', background: isAudited ? 'rgba(46, 204, 113, 0.15)' : 'rgba(212, 175, 55, 0.08)', color: isAudited ? '#2ECC71' : 'var(--text-sub)', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s ease' }}
+                            title="நிலையை மாற்ற கிளிக் செய்யவும் (Click to toggle)"
+                          >
+                            {isAudited ? '✅ சரிபார்க்கப்பட்டது (Audited)' : '👤 நிர்வாகி (Added)'}
+                          </button>
                         )}
                       </td>
                       <td className="hide-mobile" style={{ textAlign: 'right', fontSize: 11, color: 'var(--text-sub)', whiteSpace: 'nowrap' }}>
