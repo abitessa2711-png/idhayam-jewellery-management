@@ -6,7 +6,8 @@ const CATEGORIES = Object.keys(MASTER_DATA)
 
 const AddStock = ({ onAddProduct }) => {
   const [formData, setFormData] = useState({
-    category: '', subcategory: '', variant: '', detail: '', weight: '', quantity: ''
+    category: '', subcategory: '', variant: '', detail: '', weight: '', quantity: '',
+    date: new Date().toLocaleString('sv-SE').slice(0, 16).replace(' ', 'T')
   })
   const [loading, setLoading] = useState(false)
   const [success, setLoadingSuccess] = useState(false)
@@ -36,12 +37,18 @@ const AddStock = ({ onAddProduct }) => {
     setLoading(true)
     try {
       await onAddProduct({
-        ...formData,
+        category: formData.category,
+        subcategory: formData.subcategory,
+        variant: formData.variant,
         detail: formData.detail || "",
         weight: parseFloat(formData.weight || 0),
-        quantity: parseInt(formData.quantity || 0)
+        quantity: parseInt(formData.quantity || 0),
+        customDate: new Date(formData.date).toISOString()
       })
-      setFormData({ category: '', subcategory: '', variant: '', detail: '', weight: '', quantity: '' })
+      setFormData({ 
+        category: '', subcategory: '', variant: '', detail: '', weight: '', quantity: '',
+        date: new Date().toLocaleString('sv-SE').slice(0, 16).replace(' ', 'T')
+      })
       setLoadingSuccess(true)
       setTimeout(() => setLoadingSuccess(false), 3000)
     } catch (err) {
@@ -143,6 +150,16 @@ const AddStock = ({ onAddProduct }) => {
                 placeholder="0"
                 value={formData.quantity}
                 onChange={e => setFormData({ ...formData, quantity: e.target.value })}
+                required 
+              />
+            </div>
+
+            <div className="form-group">
+              <label>சேர்க்கை தேதி (Stock Date & Time) *</label>
+              <input 
+                type="datetime-local" 
+                value={formData.date}
+                onChange={e => setFormData({ ...formData, date: e.target.value })}
                 required 
               />
             </div>

@@ -264,25 +264,33 @@ export default function App() {
       if (updateErr) throw updateErr
     } else {
       // Insert new stock entry
-      const { error: stockErr } = await supabase.from('stock_entries').insert({
+      const insertData = {
         category_id: category.id,
         subcategory_id: subcategory?.id || null,
         variant_id: variant?.id || null,
         weight: newWeight,
         quantity: newQty,
         detail: newProduct.detail || ''
-      })
+      }
+      if (newProduct.customDate) {
+        insertData.created_at = newProduct.customDate
+      }
+      const { error: stockErr } = await supabase.from('stock_entries').insert(insertData)
       if (stockErr) throw stockErr
     }
 
     // 5. Create ledger entry of type ADD
-    const { error: ledgerErr } = await supabase.from('ledger').insert({
+    const ledgerData = {
       type: 'ADD',
       category_name: newProduct.category,
       subcategory_name: newProduct.subcategory || null,
       variant_name: newProduct.variant || null,
       weight: newWeight * newQty // Log the total weight added in ledger
-    })
+    }
+    if (newProduct.customDate) {
+      ledgerData.created_at = newProduct.customDate
+    }
+    const { error: ledgerErr } = await supabase.from('ledger').insert(ledgerData)
     if (ledgerErr) throw ledgerErr
   }
 
