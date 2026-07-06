@@ -211,13 +211,11 @@ const AuditPage = ({ products = [], soldItems = [], ledger = [] }) => {
                 <tr>
                   <th>பொருள் விவரம்</th>
                   <th style={{ textAlign: 'right' }}>எடை (g)</th>
-                  <th style={{ textAlign: 'right' }}>விற்பனை தொகை</th>
                   <th className="hide-mobile" style={{ textAlign: 'right' }}>தேதி</th>
                 </tr>
               </thead>
               <tbody>
                 {soldEntries.map(item => {
-                  const sellAmt = sellAmounts[item.id]
                   return (
                     <tr key={item.id} className="table-row">
                       <td>
@@ -232,9 +230,6 @@ const AuditPage = ({ products = [], soldItems = [], ledger = [] }) => {
                       <td style={{ textAlign: 'right', fontWeight: 600 }}>
                         {parseFloat(item.weight || 0).toFixed(2)}g
                       </td>
-                      <td style={{ textAlign: 'right', fontWeight: 600 }}>
-                        {sellAmt !== undefined ? `₹${sellAmt.toLocaleString('en-IN')}` : '—'}
-                      </td>
                       <td className="hide-mobile" style={{ textAlign: 'right', fontSize: 11, color: 'var(--text-sub)', whiteSpace: 'nowrap' }}>
                         {new Date(item.created_at).toLocaleDateString('en-IN')}
                       </td>
@@ -243,7 +238,7 @@ const AuditPage = ({ products = [], soldItems = [], ledger = [] }) => {
                 })}
                 {soldEntries.length === 0 && (
                   <tr>
-                    <td colSpan="4" style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-sub)' }}>
+                    <td colSpan="3" style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-sub)' }}>
                       பதிவுகள் இல்லை
                     </td>
                   </tr>
