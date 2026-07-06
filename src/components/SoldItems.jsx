@@ -15,14 +15,19 @@ const SoldItems = ({ soldItems = [] }) => {
     return matchQ && matchFrom && matchTo
   }).slice().reverse()
 
-  const totalRevenue = filtered.reduce((s, i) => s + (i.total || 0), 0)
+  const totalQuantity = filtered.reduce((s, i) => s + (i.quantity || 0), 0)
+  const totalWeight = filtered.reduce((s, i) => s + (parseFloat(i.weight) || 0), 0)
 
   return (
     <div className="animate-fade-in">
       <div className="flex-between mb-16">
         <div>
           <h2 style={{ fontSize: '24px', fontWeight: 700 }}>விற்பனை வரலாறு</h2>
-          <p className="text-sub">{filtered.length} transactions · ₹{totalRevenue.toLocaleString('en-IN')} revenue</p>
+          <p className="text-sub">
+            {filtered.length} பரிவர்த்தனைகள் (Transactions) · 
+            மொத்த எண்ணிக்கை: {totalQuantity} pcs · 
+            மொத்த எடை: {totalWeight.toFixed(3)}g
+          </p>
         </div>
       </div>
 
@@ -58,9 +63,6 @@ const SoldItems = ({ soldItems = [] }) => {
                 <th>Item</th>
                 <th className="hide-mobile">Category</th>
                 <th style={{ textAlign: 'right' }}>Qty | Wt</th>
-                <th className="hide-mobile" style={{ textAlign: 'right' }}>Rate/g</th>
-                <th className="hide-mobile" style={{ textAlign: 'right' }}>Discount</th>
-                <th style={{ textAlign: 'right' }}>Total</th>
               </tr>
             </thead>
             <tbody>
@@ -83,16 +85,11 @@ const SoldItems = ({ soldItems = [] }) => {
                   </td>
                   <td className="hide-mobile" style={{ fontSize: 13 }}>{s.category}</td>
                   <td style={{ textAlign: 'right', fontSize: 13 }}>{s.quantity || 0} | {s.weight || 0}g</td>
-                  <td className="hide-mobile" style={{ textAlign: 'right', fontSize: 13 }}>₹{s.pricePerGram?.toLocaleString('en-IN') || '—'}</td>
-                  <td className="hide-mobile" style={{ textAlign: 'right', color: '#22C55E', fontSize: 13 }}>₹{s.discountAmount || 0}</td>
-                  <td style={{ textAlign: 'right' }}>
-                    <span className="text-success fw-600">₹{s.total?.toLocaleString('en-IN')}</span>
-                  </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan="9" style={{ textAlign: 'center', padding: 48, color: 'var(--text-sub)' }}>
+                  <td colSpan="6" style={{ textAlign: 'center', padding: 48, color: 'var(--text-sub)' }}>
                     <Receipt size={40} style={{ margin: '0 auto 12px', opacity: 0.3 }} />
                     <div>No sales found</div>
                   </td>

@@ -39,29 +39,19 @@ const BillModal = ({ bill, onClose }) => {
               <thead>
                 <tr>
                   <th style={{ textAlign: 'left' }}>Item Details</th>
-                  <th className="hide-mobile" style={{ textAlign: 'center' }}>Qty</th>
-                  <th className="hide-mobile" style={{ textAlign: 'center' }}>Weight</th>
-                  <th className="hide-mobile" style={{ textAlign: 'right' }}>Rate/g</th>
-                  <th className="hide-mobile" style={{ textAlign: 'right' }}>Discount</th>
-                  <th style={{ textAlign: 'right' }}>Total</th>
+                  <th style={{ textAlign: 'center' }}>Qty</th>
+                  <th style={{ textAlign: 'right' }}>Weight</th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((item, i) => (
                   <tr key={i}>
                     <td>
-                      <div className="fw-600">{item.variant}</div>
+                      <div className="fw-600">{item.variant || item.subcategory}</div>
                       <div style={{ fontSize: '12px', color: 'var(--text-sub)' }}>{item.category} {item.detail && `- ${item.detail}`}</div>
-                      <div className="show-mobile" style={{ fontSize: '12px', color: 'var(--text-sub)', marginTop: '4px' }}>
-                        Qty: {item.quantity || 0} | Wt: {item.weight?.toFixed(3)}g | Rate: ₹{item.pricePerGram?.toLocaleString('en-IN')}
-                        {parseFloat(item.discountAmount || 0) > 0 && ` | Disc: -₹${item.discountAmount}`}
-                      </div>
                     </td>
-                    <td className="hide-mobile" style={{ textAlign: 'center' }}>{item.quantity || 0}</td>
-                    <td className="hide-mobile" style={{ textAlign: 'center' }}>{item.weight?.toFixed(3)}g</td>
-                    <td className="hide-mobile" style={{ textAlign: 'right' }}>₹{item.pricePerGram?.toLocaleString('en-IN')}</td>
-                    <td className="hide-mobile" style={{ textAlign: 'right', color: 'var(--danger)' }}>₹{item.discountAmount || 0}</td>
-                    <td style={{ textAlign: 'right', fontWeight: 600 }}>₹{item.total?.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                    <td style={{ textAlign: 'center', fontWeight: 600 }}>{item.quantity || 0} pcs</td>
+                    <td style={{ textAlign: 'right', fontWeight: 600 }}>{item.weight?.toFixed(3)}g</td>
                   </tr>
                 ))}
               </tbody>
@@ -78,21 +68,12 @@ const BillModal = ({ bill, onClose }) => {
             </div>
             <div style={{ width: '320px', background: 'var(--bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)' }}>
               <div className="flex-between mb-8" style={{ fontSize: '14px', color: 'var(--text-sub)' }}>
-                <span>Subtotal:</span>
-                <span className="fw-600 text-main">₹{finalSubtotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+                <span>மொத்த எண்ணிக்கை (Total Qty):</span>
+                <span className="fw-700 text-main">{items.reduce((s, i) => s + (i.quantity || 0), 0)} pcs</span>
               </div>
-              <div className="flex-between mb-8" style={{ fontSize: '14px', color: 'var(--danger)' }}>
-                <span>Discount:</span>
-                <span className="fw-600">- ₹{finalDiscount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
-              </div>
-              <div className="flex-between mb-8" style={{ fontSize: '14px', color: 'var(--accent)' }}>
-                <span>GST:</span>
-                <span className="fw-600">+ ₹{finalGst.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
-              </div>
-              <div style={{ borderTop: '1px dashed var(--border)', margin: '12px 0' }} />
-              <div className="flex-between fw-800" style={{ fontSize: '22px', color: 'var(--gold)' }}>
-                <span>Total:</span>
-                <span>₹{finalTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+              <div className="flex-between mb-8" style={{ fontSize: '14px', color: 'var(--text-sub)' }}>
+                <span>மொத்த எடை (Total Weight):</span>
+                <span className="fw-700 text-main">{items.reduce((s, i) => s + (parseFloat(i.weight) || 0), 0).toFixed(3)} g</span>
               </div>
             </div>
           </div>

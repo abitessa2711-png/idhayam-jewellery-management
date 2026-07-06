@@ -69,9 +69,9 @@ const SellDashboard = ({ products = [], processSale }) => {
   const addToCart = () => {
     const w = parseFloat(formData.weight || 0)
     const q = parseInt(formData.quantity || 0)
-    const r = parseFloat(formData.rate)
-    const dAmt = parseFloat(formData.discountAmt || 0)
-    const gAmt = parseFloat(formData.gstAmt || 0)
+    const r = 0
+    const dAmt = 0
+    const gAmt = 0
     
     if (!selectedStockId || !availableStock) {
       alert('இந்த பொருள் இருப்பில் இல்லை')
@@ -79,10 +79,6 @@ const SellDashboard = ({ products = [], processSale }) => {
     }
     if (w <= 0 && q <= 0) {
       alert('எடை அல்லது எண்ணிக்கை தேவை')
-      return
-    }
-    if (isNaN(r) || r <= 0) {
-      alert('விலை/g கட்டாயம்')
       return
     }
 
@@ -379,32 +375,13 @@ const SellDashboard = ({ products = [], processSale }) => {
                 setFormData({ ...formData, quantity: e.target.value, weight: w.toString() });
               }} />
             </div>
-            
-            <div className="form-group">
-              <label>விலை/g (Rate/g) <span style={{ color: 'red' }}>*</span></label>
-              <input type="number" placeholder="Enter Rate" value={formData.rate} onChange={e => setFormData({ ...formData, rate: e.target.value })} style={{ fontSize: '18px', fontWeight: 700 }} />
-            </div>
-            
-            <div className="form-group">
-              <label>Discount (₹)</label>
-              <input type="number" placeholder="0" value={formData.discountAmt} onChange={e => setFormData({ ...formData, discountAmt: e.target.value })} />
-            </div>
-            <div className="form-group grid-span-2">
-              <label>GST (₹)</label>
-              <input type="number" placeholder="0" value={formData.gstAmt} onChange={e => setFormData({ ...formData, gstAmt: e.target.value })} />
-            </div>
-          </div>
-          
-          <div style={{ margin: '15px 0', padding: '15px', background: 'rgba(212,175,55,0.08)', borderRadius: '10px', border: '1px dashed var(--gold)' }}>
-            <div className="flex-between fw-700" style={{ fontSize: '20px' }}>
-              <span>மொத்த விலை (Total):</span><span className="text-gold">₹{finalItemTotal.toLocaleString('en-IN')}</span>
-            </div>
           </div>
 
           <button 
             className="btn btn-gold btn-lg btn-full" 
             onClick={addToCart}
-            disabled={!selectedStockId || !formData.rate || parseFloat(formData.rate) <= 0}
+            disabled={!selectedStockId}
+            style={{ marginTop: '14px' }}
           >
             + பட்டியலில் சேர் (Add to Cart)
           </button>
@@ -440,24 +417,23 @@ const SellDashboard = ({ products = [], processSale }) => {
               <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-sub)' }}>பட்டியல் காலியாக உள்ளது</div>
             ) : (
               <table className="cart-table" style={{ width: '100%', fontSize: '13px' }}>
-                <thead><tr><th>Item</th><th style={{ textAlign: 'center' }}>Qty|Wt</th><th className="hide-mobile" style={{ textAlign: 'right' }}>Disc (₹)</th><th style={{ textAlign: 'right' }}>Price</th><th></th></tr></thead>
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th style={{ textAlign: 'right' }}>Qty | Wt</th>
+                    <th></th>
+                  </tr>
+                </thead>
                 <tbody>
                   {cart.map((item, idx) => (
                     <tr key={idx}>
                       <td>
-                        <div className="fw-600">{item.variant}</div>
+                        <div className="fw-600">{item.variant || item.subcategory}</div>
                         <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>
-                          {item.detail}
-                          {parseFloat(item.discountAmount || 0) > 0 && (
-                            <span className="show-mobile" style={{ color: '#22C55E', fontWeight: 600, marginTop: '2px' }}>
-                              · Disc: ₹{item.discountAmount}
-                            </span>
-                          )}
+                          {item.category} {item.detail && ` · ${item.detail}`}
                         </div>
                       </td>
-                      <td style={{ textAlign: 'center' }}>{item.quantity} | {item.weight}g</td>
-                      <td className="hide-mobile" style={{ textAlign: 'right' }}>₹{item.discountAmount}</td>
-                      <td style={{ textAlign: 'right', fontWeight: 600 }}>₹{item.total.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                      <td style={{ textAlign: 'right', fontWeight: 600 }}>{item.quantity} pcs | {item.weight}g</td>
                       <td style={{ textAlign: 'right' }}>
                         <button className="btn btn-danger-ghost" style={{ padding: 4 }} onClick={() => setCart(cart.filter((_, i) => i !== idx))}><Trash2 size={14} /></button>
                       </td>
@@ -469,12 +445,16 @@ const SellDashboard = ({ products = [], processSale }) => {
           </div>
 
           <div>
-            <div className="flex-between mb-16">
-              <span className="fw-600" style={{ fontSize: 18 }}>மொத்தம் (Total)</span>
-              <span className="text-gold" style={{ fontSize: 24, fontWeight: 800 }}>₹{cartTotal.toLocaleString('en-IN')}</span>
+            <div style={{ margin: '15px 0', padding: '15px', background: 'rgba(212,175,55,0.04)', borderRadius: '10px', border: '1px solid var(--border)', marginBottom: '16px' }}>
+              <div className="flex-between fw-600" style={{ fontSize: '14px' }}>
+                <span>மொத்த எண்ணிக்கை (Total Qty):</span><span>{cart.reduce((sum, item) => sum + (item.quantity || 0), 0)} pcs</span>
+              </div>
+              <div className="flex-between fw-600" style={{ fontSize: '14px', marginTop: '6px' }}>
+                <span>மொத்த எடை (Total Weight):</span><span>{cart.reduce((sum, item) => sum + (parseFloat(item.weight) || 0), 0).toFixed(3)} g</span>
+              </div>
             </div>
             <button className="btn btn-primary btn-lg btn-full" disabled={!cart.length || loading} onClick={handleSale}>
-              <CreditCard size={18} /> {loading ? 'செயலாக்கப்படுகிறது...' : '💳 விற்பனை & பில் (Sell & Bill)'}
+              <CreditCard size={18} /> {loading ? 'செயலாக்கப்படுகிறது...' : '💳 விற்பனை பற்றுச்சீட்டு (Log Sale)'}
             </button>
           </div>
         </div>
