@@ -21,11 +21,12 @@ const BillModal = ({ bill, onClose }) => {
         .bill-modal-box {
           background: #FFFFFF;
           color: #0F1A17;
-          width: 780px;
+          width: 740px;
           max-width: 95vw;
+          max-height: 90vh;
+          overflow-y: auto;
           border-radius: 20px;
           box-shadow: 0 30px 80px rgba(0,0,0,0.45);
-          overflow: hidden;
           position: relative;
           border: 2px solid var(--gold);
         }
@@ -175,6 +176,8 @@ const BillModal = ({ bill, onClose }) => {
             border: none !important;
             width: 100% !important;
             max-width: 100% !important;
+            max-height: none !important;
+            overflow: visible !important;
           }
           .no-print {
             display: none !important;
