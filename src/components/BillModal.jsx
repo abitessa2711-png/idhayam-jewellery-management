@@ -139,27 +139,28 @@ const BillModal = ({ bill, onClose }) => {
           line-height: 1.6;
         }
 
-        .grt-invoice-container table,
-        .grt-invoice-container table th,
-        .grt-invoice-container table td {
+        .grt-invoice-container table, .grt-invoice-container th, .grt-invoice-container td {
           border: none !important;
+          color: #000000 !important;
         }
 
         .grt-invoice-container .grt-table th {
-          background: #EBF4ED !important;
+          background: #DCEFE3 !important;
           color: #000000 !important;
-          border-top: 1.5px solid #000000 !important;
-          border-bottom: 1.5px solid #000000 !important;
-          padding: 8px 10px;
-          font-weight: 800 !important;
+          border-top: 2px solid #000000 !important;
+          border-bottom: 2px solid #000000 !important;
+          padding: 10px 10px;
+          font-weight: 800;
           text-transform: uppercase;
-          font-size: 11px;
+          font-size: 12px;
         }
 
         .grt-invoice-container .grt-table td {
           padding: 10px;
-          border-bottom: 1px solid rgba(15, 61, 52, 0.12) !important;
+          border-bottom: 1.5px solid #000000 !important;
           vertical-align: middle;
+          font-size: 13px;
+          font-weight: 600;
         }
 
         .grt-summary-grid {
@@ -303,13 +304,16 @@ const BillModal = ({ bill, onClose }) => {
 
           {/* Header Section */}
           <div className="invoice-header-grid" style={{ width: '100%' }}>
-            <div style={{ fontSize: '24px', fontWeight: 800, color: '#0F3D34', fontFamily: "'Noto Sans Tamil', sans-serif", textAlign: 'center', marginBottom: '8px', letterSpacing: '0.3px', lineHeight: '1.2' }}>
+            <div style={{ fontSize: '25px', fontWeight: 800, color: '#0F3D34', fontFamily: "'Noto Sans Tamil', sans-serif", textAlign: 'center', marginBottom: '4px', letterSpacing: '0.3px', lineHeight: '1.2' }}>
               ஈகிள் சில்வர்ஸ்
             </div>
+            <div style={{ fontSize: '12px', fontWeight: 600, color: '#C8A96A', textAlign: 'center', marginBottom: '8px' }}>
+              Eagle Silvers (Wholesale &amp; Retail Shop)
+            </div>
             
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', width: '100%', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', width: '100%', marginBottom: '8px' }}>
               <div style={{ flexShrink: 0 }}>
-                <img src={billLogo} alt="ஈகிள் சில்வர்ஸ்" style={{ height: '70px', objectFit: 'contain' }} />
+                <img src={billLogo} alt="Eagle Silvers" style={{ height: '70px', objectFit: 'contain' }} />
               </div>
               <div style={{ fontSize: '11.5px', color: '#3D5C52', lineHeight: '1.6', textAlign: 'left' }}>
                 <span style={{ fontWeight: 600 }}>📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி.</span><br />

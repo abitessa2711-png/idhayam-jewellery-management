@@ -18,14 +18,14 @@ const SERVICE_TYPES = [
 ]
 
 const EMPTY_FORM = {
-  date:          new Date().toISOString().split('T')[0],
-  customerName:  '',
-  customerPhone: '',
-  item:          '',
-  weight:        '',
-  serviceType:   'Polish (மெருகு)',
-  amount:        '',
-  notes:         '',
+  date:        new Date().toISOString().split('T')[0],
+  item:        '',
+  weight:      '',
+  serviceType: 'Polish (மெருகு)',
+  amount:      '',
+  notes:       '',
+  customerName: '',
+  mobile:       '',
 }
 
 const fmtDate = (d) => {
@@ -153,21 +153,24 @@ const printReceipt = (r) => {
     }
     table, th, td {
       border: none !important;
+      color: #000000 !important;
     }
     .grt-table th {
-      background: #EBF4ED;
+      background: #DCEFE3 !important;
       color: #000000 !important;
-      border-top: 1.5px solid #000000 !important;
-      border-bottom: 1.5px solid #000000 !important;
-      padding: 8px 10px;
-      font-weight: 800 !important;
+      border-top: 2px solid #000000 !important;
+      border-bottom: 2px solid #000000 !important;
+      padding: 10px 10px;
+      font-weight: 800;
       text-transform: uppercase;
-      font-size: 11px;
+      font-size: 12px;
     }
     .grt-table td {
       padding: 12px 10px;
-      border-bottom: 1px solid rgba(15, 61, 52, 0.12) !important;
+      border-bottom: 1.5px solid #000000 !important;
       vertical-align: middle;
+      font-size: 13px;
+      font-weight: 600;
     }
     .grt-summary-grid {
       display: grid;
@@ -228,13 +231,16 @@ const printReceipt = (r) => {
     }
   </style></head><body>
   <div class="invoice-header-grid" style="width: 100%;">
-    <div style="font-size: 24px; font-weight: 800; color: #0F3D34; font-family: 'Noto Sans Tamil', sans-serif; text-align: center; margin-bottom: 8px; letter-spacing: 0.3px; line-height: 1.2;">
+    <div style="font-size: 25px; font-weight: 800; color: #0F3D34; font-family: 'Noto Sans Tamil', sans-serif; text-align: center; margin-bottom: 4px; letter-spacing: 0.3px; line-height: 1.2;">
       ஈகிள் சில்வர்ஸ்
     </div>
+    <div style="font-size: 12px; font-weight: 600; color: #C8A96A; text-align: center; margin-bottom: 8px;">
+      Eagle Silvers (Wholesale &amp; Retail Shop)
+    </div>
     
-    <div style="display: flex; align-items: center; justify-content: center; gap: 24px; width: 100%; margin-bottom: 8px;">
+    <div style="display: flex; align-items: center; justify-content: center; gap: 20px; width: 100%; margin-bottom: 8px;">
       <div style="flex-shrink: 0;">
-        <img src="${logoUrl}" alt="ஈகிள் சில்வர்ஸ்" style="height: 70px; object-fit: contain;" />
+        <img src="${logoUrl}" alt="Eagle Silvers" style="height: 70px; object-fit: contain;" />
       </div>
       <div style="font-size: 11.5px; color: #3D5C52; line-height: 1.6; text-align: left;">
         <span style="font-weight: 600;">📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி.</span><br />
@@ -249,13 +255,13 @@ const printReceipt = (r) => {
 
   <div class="customer-invoice-meta">
     <div>
-      <span style="color: #6A9A80; fontSize: '11px'">வாடிக்கையாளர் விவரம் / Customer Info:</span>
-      <div style="font-size: 15px; font-weight: 700; color: #0F3D34; marginTop: '2px'">
+      <span style="color: #6A9A80; font-size: 11px;">வாடிக்கையாளர் விவரம் / Customer Info:</span>
+      <div style="font-size: 15px; font-weight: 700; color: #0F3D34; margin-top: 2px">
         ${r.customerName || 'Walk-in Customer'}
       </div>
-      ${r.customerPhone ? `<div style="color:#3D5C52; margin-top:2px; font-weight:600">Ph: ${r.customerPhone}</div>` : ''}
+      ${r.mobile ? `<div style="color: #3D5C52; font-size: 12px; margin-top: 2px;">Ph: ${r.mobile}</div>` : ''}
     </div>
-    <div class="meta-col-right" style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; justify-content: center;">
+    <div class="meta-col-right">
       <div><b>பில் எண் / Receipt No:</b> SVC-${r.id.toString().slice(-6)}</div>
       <div><b>தேதி / Date:</b> ${fmtDate(r.date)}</div>
     </div>
@@ -264,10 +270,10 @@ const printReceipt = (r) => {
   <table class="grt-table">
     <thead>
       <tr>
-        <th style="text-align:left; width: 45%; color: #000000 !important; font-weight: 800 !important;">பொருள் விவரம் (ITEM DETAILS)</th>
-        <th style="text-align:center; width: 25%; color: #000000 !important; font-weight: 800 !important;">சேவை வகை (SERVICE TYPE)</th>
-        <th style="text-align:right; width: 15%; color: #000000 !important; font-weight: 800 !important;">எடை (WEIGHT)</th>
-        <th style="text-align:right; width: 15%; color: #000000 !important; font-weight: 800 !important;">கட்டணம் (FEE)</th>
+        <th style="text-align:left; width: 45%">பொருள் விவரம் (Item Details)</th>
+        <th style="text-align:center; width: 25%">சேவை வகை (Service Type)</th>
+        <th style="text-align:right; width: 15%">எடை (Weight)</th>
+        <th style="text-align:right; width: 15%">கட்டணம் (Fee)</th>
       </tr>
     </thead>
     <tbody>
@@ -364,15 +370,15 @@ const Reports = () => {
     e.preventDefault()
     if (!validate()) return
     const rec = {
-      id:            Date.now(),
-      date:          form.date,
-      customerName:  form.customerName.trim(),
-      customerPhone: form.customerPhone.trim(),
-      item:          form.item.trim(),
-      weight:        parseFloat(form.weight),
-      serviceType:   form.serviceType,
-      amount:        parseFloat(form.amount),
-      notes:         form.notes.trim(),
+      id:          Date.now(),
+      date:        form.date,
+      item:        form.item.trim(),
+      weight:      parseFloat(form.weight),
+      serviceType: form.serviceType,
+      amount:      parseFloat(form.amount),
+      notes:       form.notes.trim(),
+      customerName: form.customerName.trim(),
+      mobile:       form.mobile.trim(),
     }
     setRecords(prev => [rec, ...prev])
     setForm(EMPTY_FORM)
@@ -458,26 +464,22 @@ const Reports = () => {
               <input type="date" name="date" value={form.date} onChange={handleChange} required />
             </div>
 
-            {/* Customer Name */}
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                👤 வாடிக்கையாளர் பெயர் (Customer Name)
-              </label>
-              <input
-                type="text" name="customerName" value={form.customerName} onChange={handleChange}
-                placeholder="எ.கா. Abinaya..."
-              />
-            </div>
-
-            {/* Customer Phone */}
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                📞 தொலைபேசி எண் (Phone Number)
-              </label>
-              <input
-                type="text" name="customerPhone" value={form.customerPhone} onChange={handleChange}
-                placeholder="எ.கா. 9090909090..."
-              />
+            {/* Customer Details */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>பெயர் (Customer Name)</label>
+                <input
+                  type="text" name="customerName" value={form.customerName} onChange={handleChange}
+                  placeholder="வாடிக்கையாளர் பெயர்"
+                />
+              </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>போன் (Mobile)</label>
+                <input
+                  type="text" name="mobile" value={form.mobile} onChange={handleChange}
+                  placeholder="அலைபேசி எண்"
+                />
+              </div>
             </div>
 
             {/* Item */}
