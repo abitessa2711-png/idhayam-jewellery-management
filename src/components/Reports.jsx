@@ -26,6 +26,8 @@ const EMPTY_FORM = {
   notes:       '',
   goldRate:    '',
   silverRate:  '',
+  customerName:  '',
+  customerPhone: '',
 }
 
 const fmtDate = (d) => {
@@ -259,11 +261,12 @@ const printReceipt = (r, goldRate = '', silverRate = '') => {
   <div class="customer-invoice-meta">
     <div>
       <span style="color: #6A9A80; fontSize: '11px'">வாடிக்கையாளர் விவரம் / Customer Info:</span>
-      <div style="font-size: 14px; font-weight: 700; color: #0F3D34; margin-top: 2px">Walk-in Customer</div>
+      <div style="font-size: 14px; font-weight: 700; color: #0F3D34; margin-top: 2px">\${r.customerName || 'Walk-in Customer'}</div>
+      \${r.customerPhone ? \`<div style="font-size: 11px; color: #333; margin-top: 2px; font-weight: 600">Ph: \${r.customerPhone}</div>\` : ''}
     </div>
     <div class="meta-col-right">
-      <div><b>பில் எண் / Receipt No:</b> SVC-${r.id.toString().slice(-6)}</div>
-      <div><b>தேதி / Date:</b> ${fmtDate(r.date)}</div>
+      <div><b>பில் எண் / Receipt No:</b> SVC-\${r.id.toString().slice(-6)}</div>
+      <div><b>தேதி / Date:</b> \${fmtDate(r.date)}</div>
     </div>
   </div>
 
@@ -379,6 +382,8 @@ const Reports = () => {
       serviceType: form.serviceType,
       amount:      parseFloat(form.amount),
       notes:       form.notes.trim(),
+      customerName: form.customerName.trim(),
+      customerPhone: form.customerPhone.trim(),
       goldRate:    form.goldRate,
       silverRate:  form.silverRate,
     }
@@ -457,6 +462,30 @@ const Reports = () => {
           </div>
 
           <form onSubmit={handleAdd} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+
+            {/* Customer Details */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>வாடிக்கையாளர் பெயர்</label>
+                <input
+                  type="text"
+                  name="customerName"
+                  value={form.customerName}
+                  onChange={handleChange}
+                  placeholder="Name"
+                />
+              </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>மொபைல்</label>
+                <input
+                  type="text"
+                  name="customerPhone"
+                  value={form.customerPhone}
+                  onChange={handleChange}
+                  placeholder="Mobile"
+                />
+              </div>
+            </div>
 
             {/* Date */}
             <div className="form-group" style={{ marginBottom: 0 }}>
