@@ -18,12 +18,14 @@ const SERVICE_TYPES = [
 ]
 
 const EMPTY_FORM = {
-  date:        new Date().toISOString().split('T')[0],
-  item:        '',
-  weight:      '',
-  serviceType: 'Polish (மெருகு)',
-  amount:      '',
-  notes:       '',
+  date:          new Date().toISOString().split('T')[0],
+  customerName:  '',
+  customerPhone: '',
+  item:          '',
+  weight:        '',
+  serviceType:   'Polish (மெருகு)',
+  amount:        '',
+  notes:         '',
 }
 
 const fmtDate = (d) => {
@@ -154,11 +156,11 @@ const printReceipt = (r) => {
     }
     .grt-table th {
       background: #EBF4ED;
-      color: #0F3D34;
-      border-top: 1.5px solid #0F3D34 !important;
-      border-bottom: 1.5px solid #0F3D34 !important;
+      color: #000000 !important;
+      border-top: 1.5px solid #000000 !important;
+      border-bottom: 1.5px solid #000000 !important;
       padding: 8px 10px;
-      font-weight: 700;
+      font-weight: 800 !important;
       text-transform: uppercase;
       font-size: 11px;
     }
@@ -227,18 +229,16 @@ const printReceipt = (r) => {
   </style></head><body>
   <div class="invoice-header-grid" style="width: 100%;">
     <div style="font-size: 24px; font-weight: 800; color: #0F3D34; font-family: 'Noto Sans Tamil', sans-serif; text-align: center; margin-bottom: 8px; letter-spacing: 0.3px; line-height: 1.2;">
-      இதயம் ஜூவல்லரி &amp; நகை தொழிலகம்
+      ஈகிள் சில்வர்ஸ்
     </div>
     
     <div style="display: flex; align-items: center; justify-content: center; gap: 24px; width: 100%; margin-bottom: 8px;">
       <div style="flex-shrink: 0;">
-        <img src="${logoUrl}" alt="இதயம் ஜூவல்லரி" style="height: 70px; object-fit: contain;" />
+        <img src="${logoUrl}" alt="ஈகிள் சில்வர்ஸ்" style="height: 70px; object-fit: contain;" />
       </div>
-      <div style="font-size: 11px; color: #3D5C52; line-height: 1.5; text-align: left;">
-        <span style="font-weight: 600; color: #6A9A80;">TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4</span><br />
-        <span style="font-weight: 600;">📍 940/E, SKS வில்லா, ரத்தினவிலாஸ் பஸ்ஸ்டாப், Ujjivan Bank அருகில், சிவகாசி.</span><br />
-        <span style="font-weight: 600;">📍 கிளை: 7, கீழரத வீதி, முருகன் கோயில் அருகில், சிவகாசி.</span><br />
-        <span style="font-weight: 600;">📞 95979 76729 | 81480 03454</span>
+      <div style="font-size: 11.5px; color: #3D5C52; line-height: 1.6; text-align: left;">
+        <span style="font-weight: 600;">📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி.</span><br />
+        <span style="font-weight: 600;">📞 81480 03454 | 73391 60876</span>
       </div>
     </div>
 
@@ -250,9 +250,12 @@ const printReceipt = (r) => {
   <div class="customer-invoice-meta">
     <div>
       <span style="color: #6A9A80; fontSize: '11px'">வாடிக்கையாளர் விவரம் / Customer Info:</span>
-      <div style="font-size: 14px; font-weight: 700; color: #0F3D34; margin-top: 2px">Walk-in Customer</div>
+      <div style="font-size: 15px; font-weight: 700; color: #0F3D34; marginTop: '2px'">
+        ${r.customerName || 'Walk-in Customer'}
+      </div>
+      ${r.customerPhone ? `<div style="color:#3D5C52; margin-top:2px; font-weight:600">Ph: ${r.customerPhone}</div>` : ''}
     </div>
-    <div class="meta-col-right">
+    <div class="meta-col-right" style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; justify-content: center;">
       <div><b>பில் எண் / Receipt No:</b> SVC-${r.id.toString().slice(-6)}</div>
       <div><b>தேதி / Date:</b> ${fmtDate(r.date)}</div>
     </div>
@@ -261,10 +264,10 @@ const printReceipt = (r) => {
   <table class="grt-table">
     <thead>
       <tr>
-        <th style="text-align:left; width: 45%">பொருள் விவரம் (Item Details)</th>
-        <th style="text-align:center; width: 25%">சேவை வகை (Service Type)</th>
-        <th style="text-align:right; width: 15%">எடை (Weight)</th>
-        <th style="text-align:right; width: 15%">கட்டணம் (Fee)</th>
+        <th style="text-align:left; width: 45%; color: #000000 !important; font-weight: 800 !important;">பொருள் விவரம் (ITEM DETAILS)</th>
+        <th style="text-align:center; width: 25%; color: #000000 !important; font-weight: 800 !important;">சேவை வகை (SERVICE TYPE)</th>
+        <th style="text-align:right; width: 15%; color: #000000 !important; font-weight: 800 !important;">எடை (WEIGHT)</th>
+        <th style="text-align:right; width: 15%; color: #000000 !important; font-weight: 800 !important;">கட்டணம் (FEE)</th>
       </tr>
     </thead>
     <tbody>
@@ -361,13 +364,15 @@ const Reports = () => {
     e.preventDefault()
     if (!validate()) return
     const rec = {
-      id:          Date.now(),
-      date:        form.date,
-      item:        form.item.trim(),
-      weight:      parseFloat(form.weight),
-      serviceType: form.serviceType,
-      amount:      parseFloat(form.amount),
-      notes:       form.notes.trim(),
+      id:            Date.now(),
+      date:          form.date,
+      customerName:  form.customerName.trim(),
+      customerPhone: form.customerPhone.trim(),
+      item:          form.item.trim(),
+      weight:        parseFloat(form.weight),
+      serviceType:   form.serviceType,
+      amount:        parseFloat(form.amount),
+      notes:         form.notes.trim(),
     }
     setRecords(prev => [rec, ...prev])
     setForm(EMPTY_FORM)
@@ -451,6 +456,28 @@ const Reports = () => {
                 <CalendarDays size={12} color="var(--soft-fern)" /> தேதி (Date)
               </label>
               <input type="date" name="date" value={form.date} onChange={handleChange} required />
+            </div>
+
+            {/* Customer Name */}
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                👤 வாடிக்கையாளர் பெயர் (Customer Name)
+              </label>
+              <input
+                type="text" name="customerName" value={form.customerName} onChange={handleChange}
+                placeholder="எ.கா. Abinaya..."
+              />
+            </div>
+
+            {/* Customer Phone */}
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                📞 தொலைபேசி எண் (Phone Number)
+              </label>
+              <input
+                type="text" name="customerPhone" value={form.customerPhone} onChange={handleChange}
+                placeholder="எ.கா. 9090909090..."
+              />
             </div>
 
             {/* Item */}
