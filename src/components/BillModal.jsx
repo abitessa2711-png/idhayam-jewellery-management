@@ -443,11 +443,10 @@ const BillModal = ({ bill, onClose }) => {
             fontSize: '11px',
             fontWeight: '700',
             color: '#4A6B5D',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
+            letterSpacing: '0.3px',
             fontFamily: "'Inter', sans-serif"
           }}>
-            Please report any damages or discrepancies within 7 days.
+            Terms &amp; Conditions: Gold and Silver goods purchased can be exchanged without any difference within 7 days from the date of purchase.
           </div>
 
         </div>

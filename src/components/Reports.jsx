@@ -318,8 +318,8 @@ const printReceipt = (r) => {
     <div class="signature-line">Authorized Signatory</div>
   </div>
 
-  <div style="margin-top: 28px; padding: 8px 12px; border: 1.5px solid rgba(15, 61, 52, 0.25); border-radius: 6px; text-align: center; font-size: 11px; font-weight: 700; color: #4A6B5D; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Inter', sans-serif;">
-    Please report any damages or discrepancies within 7 days.
+  <div style="margin-top: 28px; padding: 8px 12px; border: 1.5px solid rgba(15, 61, 52, 0.25); border-radius: 6px; text-align: center; font-size: 11px; font-weight: 700; color: #4A6B5D; letter-spacing: 0.3px; font-family: 'Inter', sans-serif;">
+    Terms &amp; Conditions: Gold and Silver goods purchased can be exchanged without any difference within 7 days from the date of purchase.
   </div>
 
   <script>
