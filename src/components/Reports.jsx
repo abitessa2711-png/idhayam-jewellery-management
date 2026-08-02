@@ -32,79 +32,284 @@ const fmtDate = (d) => {
 }
 
 /* ─── Print Receipt ────────────────────────────────────────── */
+const numberToEnglishWords = (num) => {
+  if (num === 0) return 'Rupees Zero Only'
+  const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen ']
+  const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety']
+  const g = ['', 'Thousand', 'Million', 'Billion', 'Trillion']
+
+  const check = (n) => {
+    let str = ''
+    if (n > 99) {
+      str += a[Math.floor(n / 100)] + 'Hundred '
+      n %= 100
+    }
+    if (n > 19) {
+      str += b[Math.floor(n / 10)] + ' ' + a[n % 10]
+    } else {
+      str += a[n]
+    }
+    return str
+  }
+
+  let i = 0
+  let words = ''
+  let temp = num
+  while (temp > 0) {
+    let rem = temp % 1000
+    if (rem > 0) {
+      words = check(rem) + g[i] + ' ' + words
+    }
+    temp = Math.floor(temp / 1000)
+    i++
+  }
+  return 'RUPEES ' + words.trim() + ' ONLY'
+}
+
 const printReceipt = (r) => {
-  const win = window.open('', '_blank', 'width=580,height=750')
+  const amountWords = numberToEnglishWords(r.amount)
+  const win = window.open('', '_blank', 'width=750,height=800')
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Service Receipt - இதயம் ஜூவல்லரி</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;600;700;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Noto Sans Tamil','Inter',sans-serif;padding:24px;background:#fff;color:#0F1A17;width:480px;margin:0 auto;border:2px solid #0F3D34}
-    .header{background:linear-gradient(135deg,#0F3D34 0%,#134E43 100%);color:#fff;text-align:center;padding:20px;margin:-24px -24px 18px -24px;border-bottom:3px solid #C8A96A}
-    .shop-title{font-size:28px;font-weight:800;color:#F0DFA8;letter-spacing:1px;margin-bottom:2px}
-    .shop-sub{font-size:14px;font-weight:600;color:#FFFFFF;margin-bottom:4px}
-    .shop-tag{font-size:11px;color:#C8A96A;letter-spacing:1.2px;text-transform:uppercase;font-weight:600;margin-bottom:8px}
-    .contacts{display:inline-block;background:rgba(0,0,0,0.25);color:#E6F0E9;padding:4px 14px;border-radius:15px;font-size:12px;font-weight:600;font-family:'Inter',sans-serif}
-    .highlights{background:#FFF9EE;border:1px dashed #C8A96A;border-radius:8px;padding:8px 12px;margin-bottom:16px;font-size:11px;color:#3F8451;font-weight:600;text-align:center;line-height:1.5}
-    .meta-bar{display:flex;justify-content:space-between;padding:10px 14px;background:#EBF4ED;border-radius:8px;margin-bottom:16px;font-size:12.5px;border:1px solid rgba(63,132,81,0.15)}
-    .service-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px}
-    .service-table th{background:#0F3D34;color:#F0DFA8;padding:9px 12px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px}
-    .service-table td{padding:10px 12px;border-bottom:1px solid rgba(63,132,81,0.15)}
-    .total-box{background:#0F3D34;color:#fff;border-radius:10px;padding:14px;text-align:center;margin:16px 0 14px}
-    .total-label{font-size:11px;color:#C8A96A;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:3px}
-    .total-val{font-size:26px;font-weight:800;color:#F0DFA8;font-family:'Inter',sans-serif}
-    .footer-address{text-align:center;font-size:11px;color:#2E5242;padding-top:10px;border-top:1px dashed rgba(63,132,81,0.3);line-height:1.5}
+    body{font-family:'Noto Sans Tamil','Inter',sans-serif;padding:30px;background:#fff;color:#0F1A17;width:700px;margin:0 auto;border:1px solid #C8A96A}
+    
+    .invoice-header-grid {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr;
+      gap: 20px;
+      border-bottom: 2px solid #0F3D34;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+    .shop-info-side {
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: #3D5C52;
+    }
+    .shop-brand-name {
+      font-size: 26px;
+      font-weight: 800;
+      color: #0F3D34;
+      margin-bottom: 2px;
+    }
+    .shop-brand-sub {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #C8A96A;
+      margin-bottom: 4px;
+    }
+    .logo-side {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+    .invoice-title-badge {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0F3D34;
+      border: 1.5px solid #0F3D34;
+      padding: 3px 12px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+      margin-top: 4px;
+      display: inline-block;
+      text-transform: uppercase;
+    }
+    .customer-invoice-meta {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 20px;
+      font-size: 12.5px;
+      padding: 8px 12px;
+      background: #F7F6F1;
+      border: 1px solid rgba(15, 61, 52, 0.12);
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    .meta-col-right {
+      text-align: right;
+      line-height: 1.6;
+    }
+    .highlights{
+      background:#FFF9EE;
+      border:1px dashed #C8A96A;
+      border-radius:8px;
+      padding:8px 12px;
+      margin-bottom:16px;
+      font-size:11px;
+      color:#3F8451;
+      font-weight:600;
+      text-align:center;
+      line-height:1.5;
+    }
+    .grt-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 18px;
+      font-size: 12.5px;
+    }
+    .grt-table th {
+      background: #EBF4ED;
+      color: #0F3D34;
+      border-top: 1.5px solid #0F3D34;
+      border-bottom: 1.5px solid #0F3D34;
+      padding: 8px 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+    .grt-table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(15, 61, 52, 0.08);
+      vertical-align: middle;
+    }
+    .grt-summary-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 24px;
+      font-size: 12px;
+      border-top: 1.5px solid #0F3D34;
+      padding-top: 12px;
+      margin-bottom: 24px;
+    }
+    .totals-block {
+      background: #F7F6F1;
+      border-radius: 8px;
+      border: 1px solid rgba(15, 61, 52, 0.12);
+      padding: 12px 16px;
+    }
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-weight: 500;
+    }
+    .totals-row.grand-total {
+      border-top: 1.5px double #0F3D34;
+      margin-top: 6px;
+      padding-top: 8px;
+      font-size: 15px;
+      font-weight: 800;
+      color: #0F3D34;
+    }
+    .signature-section {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 36px;
+      padding: 0 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #3D5C52;
+    }
+    .signature-line {
+      border-top: 1px solid #0F3D34;
+      width: 140px;
+      text-align: center;
+      padding-top: 6px;
+      margin-top: 32px;
+    }
+    .thank-you-brand {
+      text-align: center;
+      font-family: Georgia, serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: #C8A96A;
+      margin: 16px 0;
+    }
     @media print{
       body{padding:16px;margin:0 auto;width:100%;border:none}
-      .header{margin:-16px -16px 14px -16px}
       @page{margin:6mm;size:auto}
     }
   </style></head><body>
-  <div class="header">
-    <div class="shop-title">இதயம்</div>
-    <div class="shop-sub">ஜூவல்லரி &amp; நகை தொழிலகம்</div>
-    <div class="shop-tag">Wholesale &amp; Retail Shop</div>
-    <div class="contacts">📞 95979 76729 &bull; 73391 60876 &bull; 81480 03454</div>
+  <div class="invoice-header-grid">
+    <div class="shop-info-side">
+      <div style="font-size: 11px; color: #6A9A80; fontWeight: 600">TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4</div>
+      <div class="shop-brand-name">இதயம்</div>
+      <div class="shop-brand-sub">ஜூவல்லரி &amp; நகை தொழிலகம்</div>
+      <div style="font-weight: 600">Wholesale &amp; Retail Shop</div>
+      <div style="margin-top: 3px">📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி.</div>
+    </div>
+    <div class="logo-side">
+      <div style="font-weight: 600; font-size: 12px; color: #0F3D34">📞 95979 76729 | 81480 03454</div>
+      <div class="invoice-title-badge">🔧 SERVICE RECEIPT / சேவை பில்</div>
+    </div>
   </div>
 
   <div class="highlights">
-    ✨ 926 நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்<br>
-    ✨ வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை
+    ✨ 926 நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும் &nbsp;&nbsp;|&nbsp;&nbsp; ✨ வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை
   </div>
 
-  <div class="meta-bar">
-    <div><b>ரசீது எண் (Receipt):</b> SVC-${r.id.toString().slice(-6)}</div>
-    <div><b>தேதி (Date):</b> ${fmtDate(r.date)}</div>
+  <div class="customer-invoice-meta">
+    <div>
+      <span style="color: #6A9A80; fontSize: '11px'">வாடிக்கையாளர் விவரம் / Customer Info:</span>
+      <div style="font-size: 14px; font-weight: 700; color: #0F3D34; margin-top: 2px">Walk-in Customer</div>
+    </div>
+    <div class="meta-col-right">
+      <div><b>பில் எண் / Receipt No:</b> SVC-${r.id.toString().slice(-6)}</div>
+      <div><b>தேதி / Date:</b> ${fmtDate(r.date)}</div>
+    </div>
   </div>
 
-  <table class="service-table">
+  <table class="grt-table">
     <thead>
       <tr>
-        <th style="text-align:left">சேவை விவரம் (Service Details)</th>
-        <th style="text-align:right">எடை (Weight)</th>
-        <th style="text-align:right">கட்டணம் (Amount)</th>
+        <th style="text-align:left; width: 45%">பொருள் விவரம் (Item Details)</th>
+        <th style="text-align:center; width: 25%">சேவை வகை (Service Type)</th>
+        <th style="text-align:right; width: 15%">எடை (Weight)</th>
+        <th style="text-align:right; width: 15%">கட்டணம் (Fee)</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td>
-          <b style="color:#0F3D34">${r.item}</b>
-          <div style="font-size:11px;color:#5AA06D;margin-top:2px">🔧 ${r.serviceType}</div>
-          ${r.notes ? `<div style="font-size:11px;color:#6A9A80;margin-top:2px">📝 ${r.notes}</div>` : ''}
+          <strong style="color: #0F3D34">${r.item}</strong>
+          ${r.notes ? `<div style="font-size:11px; color:#6A9A80; margin-top:2px">📝 ${r.notes}</div>` : ''}
         </td>
-        <td style="text-align:right;font-weight:700;color:#A6834A">${r.weight.toFixed(3)} g</td>
-        <td style="text-align:right;font-weight:700;color:#1A7A4A">₹${Number(r.amount).toLocaleString('en-IN')}</td>
+        <td style="text-align:center; font-weight:600; color:#3D5C52">${r.serviceType}</td>
+        <td style="text-align:right; font-weight:700; color:#A6834A">${r.weight.toFixed(3)} g</td>
+        <td style="text-align:right; font-weight:700; color:#1A7A4A">₹${Number(r.amount).toLocaleString('en-IN')}</td>
       </tr>
     </tbody>
   </table>
 
-  <div class="total-box">
-    <div class="total-label">சேவை கட்டணம் (TOTAL SERVICE AMOUNT)</div>
-    <div class="total-val">₹${Number(r.amount).toLocaleString('en-IN')}</div>
+  <div class="grt-summary-grid">
+    <div>
+      <div style="font-size: 11.5px; color: #6A9A80; line-height: 1.5">
+        <b>நிபந்தனைகள் / Instructions:</b><br/>
+        • மெருகு ஏற்றப்பட்ட அல்லது சரிசெய்யப்பட்ட நகைகளை கவனமாக சரிபார்த்து வாங்கவும்.<br/>
+        • பில் ரசீது இல்லாமல் நகைகள் திரும்ப ஒப்படைக்கப்பட மாட்டாது.
+      </div>
+      <div style="margin-top: 12px">
+        <span style="font-size: 10px; color: #6A9A80; display: block; font-weight: 600">வார்த்தைகளில் / Amount in words:</span>
+        <span style="font-size: 11px; font-weight: 700; color: #0F3D34">${amountWords}</span>
+      </div>
+    </div>
+    
+    <div class="totals-block">
+      <div class="totals-row">
+        <span style="color: #6A9A80">சேவை கட்டணம் (Fee):</span>
+        <span>₹${Number(r.amount).toLocaleString('en-IN')}</span>
+      </div>
+      <div class="totals-row">
+        <span style="color: #6A9A80">நகை எடை (Weight):</span>
+        <span>${r.weight.toFixed(3)} g</span>
+      </div>
+      <div class="totals-row grand-total">
+        <span>மொத்த கட்டணம் (Net Fee):</span>
+        <span>₹${Number(r.amount).toLocaleString('en-IN')}</span>
+      </div>
+    </div>
   </div>
 
-  <div class="footer-address">
-    📍 <b>8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி.</b><br>
-    வருகைக்கு நன்றி! (Thank You!)
+  <div class="thank-you-brand">Thank You</div>
+
+  <div class="signature-section">
+    <div class="signature-line">Customer Signature</div>
+    <div class="signature-line">Authorized Signatory</div>
   </div>
 
   <script>
