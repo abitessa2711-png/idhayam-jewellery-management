@@ -515,25 +515,7 @@ const Reports = () => {
 
           </form>
 
-          {/* Totals box */}
-          {records.length > 0 && (
-            <div style={{
-              marginTop: '20px', background: 'var(--bg)', borderRadius: '10px', padding: '14px 16px',
-              border: '1px solid var(--border)'
-            }}>
-              <div style={{ fontSize: '11px', color: 'var(--text-light)', fontFamily: 'Inter', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '8px' }}>
-                மொத்த சுருக்கம்
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                <span style={{ fontSize: '12.5px', color: 'var(--text-sub)', fontFamily: "'Noto Sans Tamil', 'Inter', sans-serif" }}>மொத்த எடை</span>
-                <span style={{ fontWeight: 700, color: 'var(--primary)', fontFamily: 'Inter' }}>{totalWeight.toFixed(3)}g</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '12.5px', color: 'var(--text-sub)', fontFamily: "'Noto Sans Tamil', 'Inter', sans-serif" }}>மொத்த தொகை</span>
-                <span style={{ fontWeight: 700, color: 'var(--success)', fontFamily: 'Inter', fontSize: '15px' }}>₹{totalAmount.toLocaleString('en-IN')}</span>
-              </div>
-            </div>
-          )}
+
         </div>
 
         {/* ══ RIGHT: Service History ════════════════════════ */}
