@@ -311,9 +311,10 @@ const BillModal = ({ bill, onClose }) => {
               <div style={{ flexShrink: 0 }}>
                 <img src={billLogo} alt="இதயம் ஜூவல்லரி" style={{ height: '70px', objectFit: 'contain' }} />
               </div>
-              <div style={{ fontSize: '11.5px', color: '#3D5C52', lineHeight: '1.6', textAlign: 'left' }}>
+              <div style={{ fontSize: '11px', color: '#3D5C52', lineHeight: '1.5', textAlign: 'left' }}>
                 <span style={{ fontWeight: 600, color: '#6A9A80' }}>TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4</span><br />
-                <span style={{ fontWeight: 600 }}>📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி.</span><br />
+                <span style={{ fontWeight: 600 }}>📍 940/E, SKS வில்லா, ரத்தினவிலாஸ் பஸ்ஸ்டாப், Ujjivan Bank அருகில், சிவகாசி.</span><br />
+                <span style={{ fontWeight: 600 }}>📍 கிளை: 7, கீழரத வீதி, முருகன் கோயில் அருகில், சிவகாசி.</span><br />
                 <span style={{ fontWeight: 600 }}>📞 95979 76729 | 81480 03454</span>
               </div>
             </div>
