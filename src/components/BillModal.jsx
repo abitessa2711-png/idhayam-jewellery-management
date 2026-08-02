@@ -331,13 +331,13 @@ const BillModal = ({ bill, onClose }) => {
 
           {/* Header Section */}
           <div className="invoice-header-grid" style={{ width: '100%' }}>
-            <div style={{ fontSize: '24px', fontWeight: 800, color: '#0F3D34', fontFamily: "'Noto Sans Tamil', sans-serif", textAlign: 'center', marginBottom: '8px', letterSpacing: '0.3px', lineHeight: '1.2' }}>
+            <div style={{ fontSize: '30px', fontWeight: 800, color: '#0F3D34', fontFamily: "'Noto Sans Tamil', sans-serif", textAlign: 'center', marginBottom: '10px', letterSpacing: '0.3px', lineHeight: '1.2' }}>
               இதயம் ஜூவல்லரி &amp; நகை தொழிலகம்
             </div>
             
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', width: '100%', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', width: '100%', marginBottom: '10px' }}>
               <div style={{ flexShrink: 0 }}>
-                <img src={billLogo} alt="இதயம் ஜூவல்லரி" style={{ height: '70px', objectFit: 'contain' }} />
+                <img src={billLogo} alt="இதயம் ஜூவல்லரி" style={{ height: '85px', objectFit: 'contain' }} />
               </div>
               <div style={{ fontSize: '11px', color: '#3D5C52', lineHeight: '1.5', textAlign: 'left' }}>
                 <span style={{ fontWeight: 600, color: '#6A9A80' }}>GSTIN : 33AUIPL7759H1Z8</span><br />
@@ -436,7 +436,7 @@ const BillModal = ({ bill, onClose }) => {
               <div style={{ fontSize: '11px', color: '#6A9A80', lineHeight: '1.6' }}>
                 <b>குறிப்பு / Terms:</b><br />
                 <b>• 916 தங்கம் மற்றும் வெள்ளி நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.</b><br />
-                • வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை.
+                <b>• வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை.</b>
               </div>
               <div style={{ marginTop: '12px' }}>
                 <span style={{ fontSize: '10px', color: '#6A9A80', display: 'block', fontWeight: 600 }}>ரூபாய் வார்த்தைகளில் / Amount in words:</span>

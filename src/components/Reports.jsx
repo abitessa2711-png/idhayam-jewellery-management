@@ -228,13 +228,13 @@ const printReceipt = (r, goldRate = '', silverRate = '') => {
     }
   </style></head><body>
   <div class="invoice-header-grid" style="width: 100%;">
-    <div style="font-size: 24px; font-weight: 800; color: #0F3D34; font-family: 'Noto Sans Tamil', sans-serif; text-align: center; margin-bottom: 8px; letter-spacing: 0.3px; line-height: 1.2;">
+    <div style="font-size: 30px; font-weight: 800; color: #0F3D34; font-family: 'Noto Sans Tamil', sans-serif; text-align: center; margin-bottom: 10px; letter-spacing: 0.3px; line-height: 1.2;">
       இதயம் ஜூவல்லரி &amp; நகை தொழிலகம்
     </div>
     
-    <div style="display: flex; align-items: center; justify-content: center; gap: 24px; width: 100%; margin-bottom: 8px;">
+    <div style="display: flex; align-items: center; justify-content: center; gap: 24px; width: 100%; margin-bottom: 10px;">
       <div style="flex-shrink: 0;">
-        <img src="${logoUrl}" alt="இதயம் ஜூவல்லரி" style="height: 70px; object-fit: contain;" />
+        <img src="${logoUrl}" alt="இதயம் ஜூவல்லரி" style="height: 85px; object-fit: contain;" />
       </div>
       <div style="font-size: 11px; color: #3D5C52; line-height: 1.5; text-align: left;">
         <span style="font-weight: 600; color: #6A9A80;">GSTIN : 33AUIPL7759H1Z8</span><br />
@@ -294,7 +294,7 @@ const printReceipt = (r, goldRate = '', silverRate = '') => {
       <div style="font-size: 11.5px; color: #6A9A80; line-height: 1.5">
         <b>நிபந்தனைகள் / Instructions:</b><br/>
         <b>• 916 தங்கம் மற்றும் வெள்ளி நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.</b><br/>
-        • வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை.<br/>
+        <b>• வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை.</b><br/>
         • மெருகு ஏற்றப்பட்ட அல்லது சரிசெய்யப்பட்ட நகைகளை கவனமாக சரிபார்த்து வாங்கவும்.<br/>
         • பில் ரசீது இல்லாமல் நகைகள் திரும்ப ஒப்படைக்கப்பட மாட்டாது.
       </div>
