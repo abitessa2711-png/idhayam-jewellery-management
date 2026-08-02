@@ -76,6 +76,7 @@ const BillModal = ({ bill, onClose }) => {
           display: flex;
           flex-direction: column;
           align-items: center;
+          text-align: center;
           border-bottom: 2px solid #0F3D34;
           padding-bottom: 14px;
           margin-bottom: 16px;
@@ -139,28 +140,27 @@ const BillModal = ({ bill, onClose }) => {
           line-height: 1.6;
         }
 
-        .grt-invoice-container table, .grt-invoice-container th, .grt-invoice-container td {
+        .grt-invoice-container table,
+        .grt-invoice-container table th,
+        .grt-invoice-container table td {
           border: none !important;
-          color: #000000 !important;
         }
 
         .grt-invoice-container .grt-table th {
-          background: #DCEFE3 !important;
-          color: #000000 !important;
-          border-top: 2px solid #000000 !important;
-          border-bottom: 2px solid #000000 !important;
-          padding: 10px 10px;
-          font-weight: 800;
+          background: #EBF4ED !important;
+          color: #0F3D34 !important;
+          border-top: 1.5px solid #0F3D34 !important;
+          border-bottom: 1.5px solid #0F3D34 !important;
+          padding: 8px 10px;
+          font-weight: 700;
           text-transform: uppercase;
-          font-size: 12px;
+          font-size: 11px;
         }
 
         .grt-invoice-container .grt-table td {
           padding: 10px;
-          border-bottom: 1.5px solid #000000 !important;
+          border-bottom: 1px solid rgba(15, 61, 52, 0.12) !important;
           vertical-align: middle;
-          font-size: 13px;
-          font-weight: 600;
         }
 
         .grt-summary-grid {
@@ -303,26 +303,16 @@ const BillModal = ({ bill, onClose }) => {
         <div className="invoice-sheet">
 
           {/* Header Section */}
-          <div className="invoice-header-grid" style={{ width: '100%' }}>
-            <div style={{ fontSize: '25px', fontWeight: 800, color: '#0F3D34', fontFamily: "'Noto Sans Tamil', sans-serif", textAlign: 'center', marginBottom: '4px', letterSpacing: '0.3px', lineHeight: '1.2' }}>
-              ஈகிள் சில்வர்ஸ்
+          <div className="invoice-header-grid">
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '6px' }}>
+              <img src={billLogo} alt="இதயம் ஜூவல்லரி" style={{ height: '75px', objectFit: 'contain' }} />
             </div>
-            <div style={{ fontSize: '12px', fontWeight: 600, color: '#C8A96A', textAlign: 'center', marginBottom: '8px' }}>
-              Eagle Silvers (Wholesale &amp; Retail Shop)
+            <div style={{ fontSize: '11px', color: '#6A9A80', fontWeight: 600 }}>TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4</div>
+            <div style={{ fontSize: '11.5px', color: '#3D5C52', marginTop: '2px', fontWeight: 600, textAlign: 'center' }}>
+              📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி. &nbsp;|&nbsp; 📞 95979 76729 | 81480 03454
             </div>
-            
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', width: '100%', marginBottom: '8px' }}>
-              <div style={{ flexShrink: 0 }}>
-                <img src={billLogo} alt="Eagle Silvers" style={{ height: '70px', objectFit: 'contain' }} />
-              </div>
-              <div style={{ fontSize: '11.5px', color: '#3D5C52', lineHeight: '1.6', textAlign: 'left' }}>
-                <span style={{ fontWeight: 600 }}>📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி.</span><br />
-                <span style={{ fontWeight: 600 }}>📞 81480 03454 | 73391 60876</span>
-              </div>
-            </div>
-
-            <div style={{ textAlign: 'center', width: '100%' }}>
-              <div className="invoice-title-badge" style={{ marginTop: '4px' }}>CASH BILL / TAX INVOICE</div>
+            <div>
+              <div className="invoice-title-badge">CASH BILL / TAX INVOICE</div>
             </div>
           </div>
 
@@ -388,8 +378,9 @@ const BillModal = ({ bill, onClose }) => {
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div style={{ fontSize: '11px', color: '#6A9A80', lineHeight: '1.6' }}>
                 <b>குறிப்பு / Terms:</b><br />
-                • 916 / 92.5 நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.<br />
-                • வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை.
+                • 926 நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.<br />
+                • வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை.<br />
+                • சேதங்கள் ஏதும் இருப்பின் 2 நாட்களுக்குள் தெரிவிக்கவும்.
               </div>
               <div style={{ marginTop: '12px' }}>
                 <span style={{ fontSize: '10px', color: '#6A9A80', display: 'block', fontWeight: 600 }}>ரூபாய் வார்த்தைகளில் / Amount in words:</span>
@@ -436,21 +427,6 @@ const BillModal = ({ bill, onClose }) => {
           </div>
 
           {/* Bordered English Discrepancy Notice */}
-          <div style={{
-            marginTop: '28px',
-            padding: '8px 12px',
-            border: '1.5px solid rgba(15, 61, 52, 0.25)',
-            borderRadius: '6px',
-            textAlign: 'center',
-            fontSize: '11px',
-            fontWeight: '700',
-            color: '#4A6B5D',
-            letterSpacing: '0.3px',
-            fontFamily: "'Inter', sans-serif"
-          }}>
-            Terms &amp; Conditions: Gold and Silver goods purchased can be exchanged without any difference within 7 days from the date of purchase.
-          </div>
-
         </div>
 
       </div>

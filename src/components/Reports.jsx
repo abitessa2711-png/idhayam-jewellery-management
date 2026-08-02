@@ -24,8 +24,6 @@ const EMPTY_FORM = {
   serviceType: 'Polish (மெருகு)',
   amount:      '',
   notes:       '',
-  customerName: '',
-  mobile:       '',
 }
 
 const fmtDate = (d) => {
@@ -153,24 +151,21 @@ const printReceipt = (r) => {
     }
     table, th, td {
       border: none !important;
-      color: #000000 !important;
     }
     .grt-table th {
-      background: #DCEFE3 !important;
-      color: #000000 !important;
-      border-top: 2px solid #000000 !important;
-      border-bottom: 2px solid #000000 !important;
-      padding: 10px 10px;
-      font-weight: 800;
+      background: #EBF4ED;
+      color: #0F3D34;
+      border-top: 1.5px solid #0F3D34 !important;
+      border-bottom: 1.5px solid #0F3D34 !important;
+      padding: 8px 10px;
+      font-weight: 700;
       text-transform: uppercase;
-      font-size: 12px;
+      font-size: 11px;
     }
     .grt-table td {
       padding: 12px 10px;
-      border-bottom: 1.5px solid #000000 !important;
+      border-bottom: 1px solid rgba(15, 61, 52, 0.12) !important;
       vertical-align: middle;
-      font-size: 13px;
-      font-weight: 600;
     }
     .grt-summary-grid {
       display: grid;
@@ -230,36 +225,23 @@ const printReceipt = (r) => {
       @page{margin:6mm;size:auto}
     }
   </style></head><body>
-  <div class="invoice-header-grid" style="width: 100%;">
-    <div style="font-size: 25px; font-weight: 800; color: #0F3D34; font-family: 'Noto Sans Tamil', sans-serif; text-align: center; margin-bottom: 4px; letter-spacing: 0.3px; line-height: 1.2;">
-      ஈகிள் சில்வர்ஸ்
+  <div class="invoice-header-grid">
+    <div style="display: flex; justify-content: center; margin-bottom: 4px">
+      <img src="${logoUrl}" alt="இதயம் ஜூவல்லரி" style="height: 75px; object-fit: contain" />
     </div>
-    <div style="font-size: 12px; font-weight: 600; color: #C8A96A; text-align: center; margin-bottom: 8px;">
-      Eagle Silvers (Wholesale &amp; Retail Shop)
+    <div style="font-size: 11px; color: #6A9A80; fontWeight: 600">TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4</div>
+    <div style="font-size: 11.5px; color: #3D5C52; margin-top: 2px; font-weight: 600; text-align: center">
+      📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி. &nbsp;|&nbsp; 📞 95979 76729 | 81480 03454
     </div>
-    
-    <div style="display: flex; align-items: center; justify-content: center; gap: 20px; width: 100%; margin-bottom: 8px;">
-      <div style="flex-shrink: 0;">
-        <img src="${logoUrl}" alt="Eagle Silvers" style="height: 70px; object-fit: contain;" />
-      </div>
-      <div style="font-size: 11.5px; color: #3D5C52; line-height: 1.6; text-align: left;">
-        <span style="font-weight: 600;">📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி.</span><br />
-        <span style="font-weight: 600;">📞 81480 03454 | 73391 60876</span>
-      </div>
-    </div>
-
-    <div style="text-align: center; width: 100%;">
-      <div class="invoice-title-badge" style="margin-top: 4px;">🔧 SERVICE RECEIPT / சேவை பில்</div>
+    <div>
+      <div class="invoice-title-badge">🔧 SERVICE RECEIPT / சேவை பில்</div>
     </div>
   </div>
 
   <div class="customer-invoice-meta">
     <div>
-      <span style="color: #6A9A80; font-size: 11px;">வாடிக்கையாளர் விவரம் / Customer Info:</span>
-      <div style="font-size: 15px; font-weight: 700; color: #0F3D34; margin-top: 2px">
-        ${r.customerName || 'Walk-in Customer'}
-      </div>
-      ${r.mobile ? `<div style="color: #3D5C52; font-size: 12px; margin-top: 2px;">Ph: ${r.mobile}</div>` : ''}
+      <span style="color: #6A9A80; fontSize: '11px'">வாடிக்கையாளர் விவரம் / Customer Info:</span>
+      <div style="font-size: 14px; font-weight: 700; color: #0F3D34; margin-top: 2px">Walk-in Customer</div>
     </div>
     <div class="meta-col-right">
       <div><b>பில் எண் / Receipt No:</b> SVC-${r.id.toString().slice(-6)}</div>
@@ -293,8 +275,6 @@ const printReceipt = (r) => {
     <div>
       <div style="font-size: 11.5px; color: #6A9A80; line-height: 1.5">
         <b>நிபந்தனைகள் / Instructions:</b><br/>
-        • 916 / 92.5 நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.<br/>
-        • வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை.<br/>
         • மெருகு ஏற்றப்பட்ட அல்லது சரிசெய்யப்பட்ட நகைகளை கவனமாக சரிபார்த்து வாங்கவும்.<br/>
         • பில் ரசீது இல்லாமல் நகைகள் திரும்ப ஒப்படைக்கப்பட மாட்டாது.
       </div>
@@ -325,10 +305,6 @@ const printReceipt = (r) => {
   <div class="signature-section">
     <div class="signature-line">Customer Signature</div>
     <div class="signature-line">Authorized Signatory</div>
-  </div>
-
-  <div style="margin-top: 28px; padding: 8px 12px; border: 1.5px solid rgba(15, 61, 52, 0.25); border-radius: 6px; text-align: center; font-size: 11px; font-weight: 700; color: #4A6B5D; letter-spacing: 0.3px; font-family: 'Inter', sans-serif;">
-    Terms &amp; Conditions: Gold and Silver goods purchased can be exchanged without any difference within 7 days from the date of purchase.
   </div>
 
   <script>
@@ -377,8 +353,6 @@ const Reports = () => {
       serviceType: form.serviceType,
       amount:      parseFloat(form.amount),
       notes:       form.notes.trim(),
-      customerName: form.customerName.trim(),
-      mobile:       form.mobile.trim(),
     }
     setRecords(prev => [rec, ...prev])
     setForm(EMPTY_FORM)
@@ -462,24 +436,6 @@ const Reports = () => {
                 <CalendarDays size={12} color="var(--soft-fern)" /> தேதி (Date)
               </label>
               <input type="date" name="date" value={form.date} onChange={handleChange} required />
-            </div>
-
-            {/* Customer Details */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label>பெயர் (Customer Name)</label>
-                <input
-                  type="text" name="customerName" value={form.customerName} onChange={handleChange}
-                  placeholder="வாடிக்கையாளர் பெயர்"
-                />
-              </div>
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label>போன் (Mobile)</label>
-                <input
-                  type="text" name="mobile" value={form.mobile} onChange={handleChange}
-                  placeholder="அலைபேசி எண்"
-                />
-              </div>
             </div>
 
             {/* Item */}
