@@ -1,15 +1,16 @@
 import React from 'react'
 import { Printer, X, Phone, MapPin } from 'lucide-react'
+import billLogo from './bill_logo.png'
 
 const BillModal = ({ bill, onClose }) => {
   if (!bill) return null
   const items = bill.items || []
 
-  const totalQty       = items.reduce((s, i) => s + (i.quantity || 0), 0)
-  const totalWeight    = items.reduce((s, i) => s + (parseFloat(i.weight) || 0), 0)
-  const totalGross     = items.reduce((s, i) => s + (parseFloat(i.grossAmount || i.subtotal || i.total) || 0), 0)
-  const totalDiscount  = items.reduce((s, i) => s + (parseFloat(i.discountAmount) || 0), 0)
-  const netTotal       = items.reduce((s, i) => s + (parseFloat(i.total) || 0), 0)
+  const totalQty = items.reduce((s, i) => s + (i.quantity || 0), 0)
+  const totalWeight = items.reduce((s, i) => s + (parseFloat(i.weight) || 0), 0)
+  const totalGross = items.reduce((s, i) => s + (parseFloat(i.grossAmount || i.subtotal || i.total) || 0), 0)
+  const totalDiscount = items.reduce((s, i) => s + (parseFloat(i.discountAmount) || 0), 0)
+  const netTotal = items.reduce((s, i) => s + (parseFloat(i.total) || 0), 0)
 
   const handlePrint = () => {
     window.print()
@@ -72,11 +73,12 @@ const BillModal = ({ bill, onClose }) => {
         }
 
         .invoice-header-grid {
-          display: grid;
-          grid-template-columns: 1.8fr 1fr;
-          gap: 20px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
           border-bottom: 2px solid #0F3D34;
-          padding-bottom: 12px;
+          padding-bottom: 14px;
           margin-bottom: 16px;
         }
 
@@ -252,7 +254,7 @@ const BillModal = ({ bill, onClose }) => {
       `}</style>
 
       <div className="grt-invoice-container animate-fade-in" onClick={e => e.stopPropagation()}>
-        
+
         {/* Top Control Bar (Hidden when printing) */}
         <div className="no-print" style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -287,24 +289,18 @@ const BillModal = ({ bill, onClose }) => {
 
         {/* Printable Invoice Sheet */}
         <div className="invoice-sheet">
-          
+
           {/* Header Section */}
           <div className="invoice-header-grid">
-            <div className="shop-info-side">
-              <div style={{ fontSize: '11px', color: '#6A9A80', fontWeight: 600 }}>TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4</div>
-              <div className="shop-brand-name">இதயம்</div>
-              <div className="shop-brand-sub">ஜூவல்லரி &amp; நகை தொழிலகம்</div>
-              <div style={{ fontWeight: 600 }}>Wholesale &amp; Retail Shop</div>
-              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '3px' }}>
-                <MapPin size={11} color="var(--gold)" />
-                8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி.
-              </div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+              <img src={billLogo} alt="இதயம் ஜூவல்லரி" style={{ height: '110px', objectFit: 'contain' }} />
             </div>
-            <div className="logo-side">
-              <div style={{ fontWeight: 600, fontSize: '12px', color: '#0F3D34' }}>
-                <Phone size={11} style={{ display: 'inline', marginRight: '4px' }} />
-                95979 76729 | 81480 03454
-              </div>
+            <div style={{ fontSize: '11.5px', color: '#3D5C52', lineHeight: '1.6' }}>
+              <span style={{ fontWeight: 600, color: '#6A9A80' }}>TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4</span><br />
+              <span style={{ fontWeight: 600 }}>📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி.</span> &nbsp;|&nbsp;&nbsp;
+              <span style={{ fontWeight: 600 }}>📞 95979 76729 | 81480 03454</span>
+            </div>
+            <div>
               <div className="invoice-title-badge">CASH BILL / TAX INVOICE</div>
             </div>
           </div>
@@ -371,7 +367,7 @@ const BillModal = ({ bill, onClose }) => {
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div style={{ fontSize: '11px', color: '#6A9A80', lineHeight: '1.6' }}>
                 <b>குறிப்பு / Terms:</b><br />
-                • 926 நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.<br />
+                • 916 நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.<br />
                 • வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை.<br />
                 • சேதங்கள் ஏதும் இருப்பின் 2 நாட்களுக்குள் தெரிவிக்கவும்.
               </div>
@@ -380,7 +376,7 @@ const BillModal = ({ bill, onClose }) => {
                 <span style={{ fontSize: '11px', fontWeight: 700, color: '#0F3D34' }}>{numberToEnglishWords(netTotal)}</span>
               </div>
             </div>
-            
+
             <div className="totals-block">
               <div className="totals-row">
                 <span style={{ color: '#6A9A80' }}>மொத்த மதிப்பு (Sub Total):</span>

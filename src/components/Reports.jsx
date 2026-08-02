@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { PlusCircle, Trash2, Wrench, Scale, IndianRupee, CalendarDays, ClipboardList, Printer, X, Search } from 'lucide-react'
+import billLogo from './bill_logo.png'
 
 /* ─── localStorage helpers ─────────────────────────────────── */
 const STORAGE_KEY = 'idhayam_service_log'
@@ -67,6 +68,7 @@ const numberToEnglishWords = (num) => {
 }
 
 const printReceipt = (r) => {
+  const logoUrl = window.location.origin + billLogo
   const amountWords = numberToEnglishWords(r.amount)
   const win = window.open('', '_blank', 'width=750,height=800')
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Service Receipt - இதயம் ஜூவல்லரி</title>
@@ -76,16 +78,17 @@ const printReceipt = (r) => {
     body{font-family:'Noto Sans Tamil','Inter',sans-serif;padding:30px;background:#fff;color:#0F1A17;width:700px;margin:0 auto;border:1px solid #C8A96A}
     
     .invoice-header-grid {
-      display: grid;
-      grid-template-columns: 1.8fr 1fr;
-      gap: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
       border-bottom: 2px solid #0F3D34;
-      padding-bottom: 12px;
+      padding-bottom: 14px;
       margin-bottom: 16px;
     }
     .shop-info-side {
       font-size: 11.5px;
-      line-height: 1.5;
+      line-height: 1.6;
       color: #3D5C52;
     }
     .shop-brand-name {
@@ -226,15 +229,15 @@ const printReceipt = (r) => {
     }
   </style></head><body>
   <div class="invoice-header-grid">
-    <div class="shop-info-side">
-      <div style="font-size: 11px; color: #6A9A80; fontWeight: 600">TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4</div>
-      <div class="shop-brand-name">இதயம்</div>
-      <div class="shop-brand-sub">ஜூவல்லரி &amp; நகை தொழிலகம்</div>
-      <div style="font-weight: 600">Wholesale &amp; Retail Shop</div>
-      <div style="margin-top: 3px">📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி.</div>
+    <div style="display: flex; justify-content: center; marginBottom: 8px">
+      <img src="${logoUrl}" alt="இதயம் ஜூவல்லரி" style="height: 110px; object-fit: contain" />
     </div>
-    <div class="logo-side">
-      <div style="font-weight: 600; font-size: 12px; color: #0F3D34">📞 95979 76729 | 81480 03454</div>
+    <div style="font-size: 11.5px; color: #3D5C52; line-height: 1.6">
+      <span style="font-weight: 600; color: #6A9A80">TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4</span><br />
+      <span style="font-weight: 600">📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி.</span> &nbsp;|&nbsp;&nbsp;
+      <span style="font-weight: 600">📞 95979 76729 | 81480 03454</span>
+    </div>
+    <div>
       <div class="invoice-title-badge">🔧 SERVICE RECEIPT / சேவை பில்</div>
     </div>
   </div>
