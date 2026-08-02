@@ -149,17 +149,14 @@ const printReceipt = (r) => {
       text-align:center;
       line-height:1.5;
     }
-    .grt-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 18px;
-      font-size: 12.5px;
+    table, th, td {
+      border: none !important;
     }
     .grt-table th {
       background: #EBF4ED;
       color: #0F3D34;
-      border-top: 1.5px solid #0F3D34;
-      border-bottom: 1.5px solid #0F3D34;
+      border-top: 1.5px solid #0F3D34 !important;
+      border-bottom: 1.5px solid #0F3D34 !important;
       padding: 8px 10px;
       font-weight: 700;
       text-transform: uppercase;
@@ -167,7 +164,7 @@ const printReceipt = (r) => {
     }
     .grt-table td {
       padding: 12px 10px;
-      border-bottom: 1px solid rgba(15, 61, 52, 0.08);
+      border-bottom: 1px solid rgba(15, 61, 52, 0.12) !important;
       vertical-align: middle;
     }
     .grt-summary-grid {

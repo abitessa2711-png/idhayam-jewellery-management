@@ -140,27 +140,26 @@ const BillModal = ({ bill, onClose }) => {
           line-height: 1.6;
         }
 
-        .grt-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 18px;
-          font-size: 12.5px;
+        .grt-invoice-container table,
+        .grt-invoice-container table th,
+        .grt-invoice-container table td {
+          border: none !important;
         }
 
-        .grt-table th {
+        .grt-invoice-container .grt-table th {
           background: #EBF4ED !important;
           color: #0F3D34 !important;
-          border-top: 1.5px solid #0F3D34;
-          border-bottom: 1.5px solid #0F3D34;
+          border-top: 1.5px solid #0F3D34 !important;
+          border-bottom: 1.5px solid #0F3D34 !important;
           padding: 8px 10px;
           font-weight: 700;
           text-transform: uppercase;
           font-size: 11px;
         }
 
-        .grt-table td {
+        .grt-invoice-container .grt-table td {
           padding: 10px;
-          border-bottom: 1px solid rgba(15, 61, 52, 0.08);
+          border-bottom: 1px solid rgba(15, 61, 52, 0.12) !important;
           vertical-align: middle;
         }
 
@@ -226,6 +225,15 @@ const BillModal = ({ bill, onClose }) => {
         }
 
         @media print {
+          @page {
+            size: A4 portrait;
+            margin: 15mm 15mm 15mm 15mm !important;
+          }
+          body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #ffffff !important;
+          }
           body * {
             visibility: hidden;
           }
@@ -238,6 +246,7 @@ const BillModal = ({ bill, onClose }) => {
             width: 100%; height: 100%;
             background: #FFFFFF !important;
             padding: 0 !important;
+            display: block !important;
           }
           .grt-invoice-container {
             box-shadow: none !important;
@@ -246,6 +255,9 @@ const BillModal = ({ bill, onClose }) => {
             max-width: 100% !important;
             max-height: none !important;
             overflow: visible !important;
+          }
+          .invoice-sheet {
+            padding: 0 !important;
           }
           .no-print {
             display: none !important;
@@ -367,7 +379,7 @@ const BillModal = ({ bill, onClose }) => {
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div style={{ fontSize: '11px', color: '#6A9A80', lineHeight: '1.6' }}>
                 <b>குறிப்பு / Terms:</b><br />
-                • 916 நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.<br />
+                • 926 நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.<br />
                 • வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை.<br />
                 • சேதங்கள் ஏதும் இருப்பின் 2 நாட்களுக்குள் தெரிவிக்கவும்.
               </div>
