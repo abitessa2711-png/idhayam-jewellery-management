@@ -225,16 +225,24 @@ const printReceipt = (r) => {
       @page{margin:6mm;size:auto}
     }
   </style></head><body>
-  <div class="invoice-header-grid">
-    <div style="display: flex; justify-content: center; margin-bottom: 4px">
-      <img src="${logoUrl}" alt="இதயம் ஜூவல்லரி" style="height: 75px; object-fit: contain" />
+  <div class="invoice-header-grid" style="width: 100%;">
+    <div style="font-size: 24px; font-weight: 800; color: #0F3D34; font-family: 'Noto Sans Tamil', sans-serif; text-align: center; margin-bottom: 8px; letter-spacing: 0.3px; line-height: 1.2;">
+      இதயம் ஜூவல்லரி &amp; நகை தொழிலகம்
     </div>
-    <div style="font-size: 11px; color: #6A9A80; fontWeight: 600">TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4</div>
-    <div style="font-size: 11.5px; color: #3D5C52; margin-top: 2px; font-weight: 600; text-align: center">
-      📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி. &nbsp;|&nbsp; 📞 95979 76729 | 81480 03454
+    
+    <div style="display: flex; align-items: center; justify-content: center; gap: 24px; width: 100%; margin-bottom: 8px;">
+      <div style="flex-shrink: 0;">
+        <img src="${logoUrl}" alt="இதயம் ஜூவல்லரி" style="height: 70px; object-fit: contain;" />
+      </div>
+      <div style="font-size: 11.5px; color: #3D5C52; line-height: 1.6; text-align: left;">
+        <span style="font-weight: 600; color: #6A9A80;">TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4</span><br />
+        <span style="font-weight: 600;">📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி.</span><br />
+        <span style="font-weight: 600;">📞 95979 76729 | 81480 03454</span>
+      </div>
     </div>
-    <div>
-      <div class="invoice-title-badge">🔧 SERVICE RECEIPT / சேவை பில்</div>
+
+    <div style="text-align: center; width: 100%;">
+      <div class="invoice-title-badge" style="margin-top: 4px;">🔧 SERVICE RECEIPT / சேவை பில்</div>
     </div>
   </div>
 
