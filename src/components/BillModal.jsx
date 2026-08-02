@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Printer, X, Phone, MapPin } from 'lucide-react'
 import billLogo from './bill_logo.png'
 
 const BillModal = ({ bill, onClose }) => {
   if (!bill) return null
+  const [goldRate, setGoldRate] = useState('')
+  const [silverRate, setSilverRate] = useState('')
   const items = bill.items || []
 
   const totalQty = items.reduce((s, i) => s + (i.quantity || 0), 0)
@@ -269,11 +271,37 @@ const BillModal = ({ bill, onClose }) => {
         {/* Top Control Bar (Hidden when printing) */}
         <div className="no-print" style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '12px 24px', background: '#0F3D34', borderBottom: '1px solid rgba(255,255,255,0.1)'
+          padding: '12px 24px', background: '#0F3D34', borderBottom: '1px solid rgba(255,255,255,0.1)',
+          gap: '15px', flexWrap: 'wrap'
         }}>
           <span style={{ color: '#F0DFA8', fontWeight: 600, fontSize: '13.5px' }}>
             🧾 பில் அச்சு வடிவம் (Invoice Print Preview)
           </span>
+
+          {/* Today Rate Inputs */}
+          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <label style={{ color: '#F0DFA8', fontSize: '12px', fontWeight: '600' }}>தங்கம் (Gold 1g):</label>
+              <input
+                type="text"
+                placeholder="எ.கா. 7250"
+                value={goldRate}
+                onChange={e => setGoldRate(e.target.value)}
+                style={{ width: '85px', padding: '4px 8px', borderRadius: '6px', border: '1px solid #C8A96A', background: '#0B2923', color: '#FFFDF6', fontSize: '12px', fontWeight: '600' }}
+              />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <label style={{ color: '#F0DFA8', fontSize: '12px', fontWeight: '600' }}>வெள்ளி (Silver 1g):</label>
+              <input
+                type="text"
+                placeholder="எ.கா. 105"
+                value={silverRate}
+                onChange={e => setSilverRate(e.target.value)}
+                style={{ width: '75px', padding: '4px 8px', borderRadius: '6px', border: '1px solid #C8A96A', background: '#0B2923', color: '#FFFDF6', fontSize: '12px', fontWeight: '600' }}
+              />
+            </div>
+          </div>
+
           <div style={{ display: 'flex', gap: '10px' }}>
             <button
               onClick={handlePrint}
@@ -318,6 +346,27 @@ const BillModal = ({ bill, onClose }) => {
                 <span style={{ fontWeight: 600 }}>📞 95979 76729 | 81480 03454</span>
               </div>
             </div>
+
+            {/* Today Rate Display Box inside printable sheet */}
+            {(goldRate || silverRate) && (
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '24px',
+                marginTop: '4px',
+                marginBottom: '4px',
+                padding: '5px 16px',
+                border: '1px solid rgba(15, 61, 52, 0.25)',
+                borderRadius: '6px',
+                background: '#FFFDF9',
+                fontSize: '11.5px',
+                fontWeight: '700',
+                color: '#0F3D34'
+              }}>
+                {goldRate && <span>Today Gold Rate (1g): ₹{Number(goldRate).toLocaleString('en-IN')}</span>}
+                {silverRate && <span>Today Silver Rate (1g): ₹{Number(silverRate).toLocaleString('en-IN')}</span>}
+              </div>
+            )}
 
             <div style={{ textAlign: 'center', width: '100%' }}>
               <div className="invoice-title-badge" style={{ marginTop: '4px' }}>CASH BILL / TAX INVOICE</div>
@@ -386,7 +435,7 @@ const BillModal = ({ bill, onClose }) => {
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div style={{ fontSize: '11px', color: '#6A9A80', lineHeight: '1.6' }}>
                 <b>குறிப்பு / Terms:</b><br />
-                • 916 / 92.5 நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.<br />
+                <b>• 916 தங்கம் மற்றும் வெள்ளி நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.</b><br />
                 • வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை.
               </div>
               <div style={{ marginTop: '12px' }}>

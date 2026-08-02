@@ -67,7 +67,7 @@ const numberToEnglishWords = (num) => {
   return 'RUPEES ' + words.trim() + ' ONLY'
 }
 
-const printReceipt = (r) => {
+const printReceipt = (r, goldRate = '', silverRate = '') => {
   const logoUrl = window.location.origin + billLogo
   const amountWords = numberToEnglishWords(r.amount)
   const win = window.open('', '_blank', 'width=750,height=800')
@@ -242,6 +242,13 @@ const printReceipt = (r) => {
       </div>
     </div>
 
+    \${(goldRate || silverRate) ? \`
+      <div style="display: flex; justify-content: center; gap: 24px; margin-top: 4px; margin-bottom: 4px; padding: 5px 16px; border: 1px solid rgba(15, 61, 52, 0.25); border-radius: 6px; background: #FFFDF9; font-size: 11.5px; font-weight: 700; color: #0F3D34;">
+        \${goldRate ? \`<span>Today Gold Rate (1g): ₹\${Number(goldRate).toLocaleString('en-IN')}</span>\` : ''}
+        \${silverRate ? \`<span>Today Silver Rate (1g): ₹\${Number(silverRate).toLocaleString('en-IN')}</span>\` : ''}
+      </div>
+    \` : ''}
+
     <div style="text-align: center; width: 100%;">
       <div class="invoice-title-badge" style="margin-top: 4px;">🔧 SERVICE RECEIPT / சேவை பில்</div>
     </div>
@@ -284,7 +291,7 @@ const printReceipt = (r) => {
     <div>
       <div style="font-size: 11.5px; color: #6A9A80; line-height: 1.5">
         <b>நிபந்தனைகள் / Instructions:</b><br/>
-        • 916 / 92.5 நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.<br/>
+        <b>• 916 தங்கம் மற்றும் வெள்ளி நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.</b><br/>
         • வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை.<br/>
         • மெருகு ஏற்றப்பட்ட அல்லது சரிசெய்யப்பட்ட நகைகளை கவனமாக சரிபார்த்து வாங்கவும்.<br/>
         • பில் ரசீது இல்லாமல் நகைகள் திரும்ப ஒப்படைக்கப்பட மாட்டாது.
@@ -336,6 +343,8 @@ const printReceipt = (r) => {
 const Reports = () => {
   const [records, setRecords]   = useState(loadRecords)
   const [form, setForm]         = useState(EMPTY_FORM)
+  const [goldRate, setGoldRate] = useState('')
+  const [silverRate, setSilverRate] = useState('')
   const [search, setSearch]     = useState('')
   const [saved, setSaved]       = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -566,6 +575,36 @@ const Reports = () => {
             )}
           </div>
 
+          {/* Today Rate Settings */}
+          <div style={{
+            display: 'flex', gap: '15px', alignItems: 'center',
+            background: 'var(--bg)', border: '1.5px solid rgba(200,169,106,0.3)',
+            borderRadius: '10px', padding: '10px 14px', marginBottom: '16px',
+            fontSize: '12px', flexWrap: 'wrap'
+          }}>
+            <span style={{ fontWeight: 700, color: 'var(--primary)', fontFamily: "'Noto Sans Tamil', sans-serif" }}>இன்றைய விலை (பிரிண்ட்டிற்கு):</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <label style={{ color: 'var(--text-sub)', fontWeight: '600' }}>தங்கம் 1g:</label>
+              <input
+                type="text"
+                placeholder="எ.கா. 7250"
+                value={goldRate}
+                onChange={e => setGoldRate(e.target.value)}
+                style={{ width: '75px', height: '28px', padding: '0 8px', borderRadius: '6px', border: '1px solid var(--border)', background: '#fff', fontSize: '11px', fontWeight: '600' }}
+              />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <label style={{ color: 'var(--text-sub)', fontWeight: '600' }}>வெள்ளி 1g:</label>
+              <input
+                type="text"
+                placeholder="எ.கா. 105"
+                value={silverRate}
+                onChange={e => setSilverRate(e.target.value)}
+                style={{ width: '65px', height: '28px', padding: '0 8px', borderRadius: '6px', border: '1px solid var(--border)', background: '#fff', fontSize: '11px', fontWeight: '600' }}
+              />
+            </div>
+          </div>
+
           {/* History list */}
           {filtered.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-sub)' }}>
@@ -637,7 +676,7 @@ const Reports = () => {
                     <div style={{ display: 'flex', gap: '6px' }}>
                       {/* Print */}
                       <button
-                        onClick={() => printReceipt(r)}
+                        onClick={() => printReceipt(r, goldRate, silverRate)}
                         title="Print Receipt"
                         style={{
                           width: '32px', height: '32px', borderRadius: '8px', border: '1px solid var(--border)',
