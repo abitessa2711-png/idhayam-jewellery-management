@@ -229,8 +229,8 @@ const printReceipt = (r) => {
     }
   </style></head><body>
   <div class="invoice-header-grid">
-    <div style="display: flex; justify-content: center; marginBottom: 8px">
-      <img src="${logoUrl}" alt="இதயம் ஜூவல்லரி" style="height: 110px; object-fit: contain" />
+    <div style="display: flex; justify-content: center; margin-bottom: 4px">
+      <img src="${logoUrl}" alt="இதயம் ஜூவல்லரி" style="height: 75px; object-fit: contain" />
     </div>
     <div style="font-size: 11.5px; color: #3D5C52; line-height: 1.6">
       <span style="font-weight: 600; color: #6A9A80">TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4</span><br />

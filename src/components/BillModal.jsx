@@ -292,8 +292,8 @@ const BillModal = ({ bill, onClose }) => {
 
           {/* Header Section */}
           <div className="invoice-header-grid">
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
-              <img src={billLogo} alt="இதயம் ஜூவல்லரி" style={{ height: '110px', objectFit: 'contain' }} />
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '4px' }}>
+              <img src={billLogo} alt="இதயம் ஜூவல்லரி" style={{ height: '75px', objectFit: 'contain' }} />
             </div>
             <div style={{ fontSize: '11.5px', color: '#3D5C52', lineHeight: '1.6' }}>
               <span style={{ fontWeight: 600, color: '#6A9A80' }}>TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4</span><br />
