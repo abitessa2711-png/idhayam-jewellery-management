@@ -74,12 +74,12 @@ const BillModal = ({ bill, onClose }) => {
 
         .invoice-header-grid {
           display: flex;
+          flex-direction: column;
           align-items: center;
-          gap: 24px;
+          text-align: center;
           border-bottom: 2px solid #0F3D34;
-          padding-bottom: 16px;
+          padding-bottom: 14px;
           margin-bottom: 16px;
-          text-align: left;
         }
 
         .shop-info-side {
@@ -303,23 +303,15 @@ const BillModal = ({ bill, onClose }) => {
         <div className="invoice-sheet">
 
           {/* Header Section */}
-          <div className="invoice-header-grid" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flex: '1' }}>
+          <div className="invoice-header-grid">
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '6px' }}>
               <img src={billLogo} alt="இதயம் ஜூவல்லரி" style={{ height: '75px', objectFit: 'contain' }} />
-              <div>
-                <div style={{ fontSize: '23px', fontWeight: 800, color: '#0F3D34', fontFamily: "'Noto Sans Tamil', sans-serif", letterSpacing: '0.3px', lineHeight: '1.2' }}>
-                  இதயம் ஜூவல்லரி &amp; நகை தொழிலகம்
-                </div>
-                <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#C8A96A', margin: '2px 0' }}>
-                  Idhayam Jewellery &amp; Works (Wholesale &amp; Retail Shop)
-                </div>
-                <div style={{ fontSize: '11px', color: '#6A9A80', lineHeight: '1.4' }}>
-                  TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4<br />
-                  📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி. &nbsp;|&nbsp; 📞 95979 76729 | 81480 03454
-                </div>
-              </div>
             </div>
-            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+            <div style={{ fontSize: '11px', color: '#6A9A80', fontWeight: 600 }}>TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4</div>
+            <div style={{ fontSize: '11.5px', color: '#3D5C52', marginTop: '2px', fontWeight: 600, textAlign: 'center' }}>
+              📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி. &nbsp;|&nbsp; 📞 95979 76729 | 81480 03454
+            </div>
+            <div>
               <div className="invoice-title-badge">CASH BILL / TAX INVOICE</div>
             </div>
           </div>
@@ -386,7 +378,7 @@ const BillModal = ({ bill, onClose }) => {
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div style={{ fontSize: '11px', color: '#6A9A80', lineHeight: '1.6' }}>
                 <b>குறிப்பு / Terms:</b><br />
-                • 926 நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.<br />
+                • 916 / 92.5 நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.<br />
                 • வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை.<br />
                 • சேதங்கள் ஏதும் இருப்பின் 2 நாட்களுக்குள் தெரிவிக்கவும்.
               </div>
