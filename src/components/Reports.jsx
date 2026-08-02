@@ -418,7 +418,21 @@ const Reports = () => {
           </p>
         </div>
         {/* Summary pills */}
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          {records.length > 0 && (
+            <button
+              onClick={() => {
+                if (window.confirm('அனைத்து சேவை பதிவுகளையும் நீக்க வேண்டுமா? (Clear all service logs?)')) {
+                  setRecords([])
+                  localStorage.removeItem(STORAGE_KEY)
+                }
+              }}
+              className="btn btn-danger-ghost"
+              style={{ padding: '6px 12px', fontSize: '11px', height: 'auto', display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              <Trash2 size={13} /> பதிவுகளை நீக்கு (Clear All)
+            </button>
+          )}
           <div style={{ background: 'var(--primary)', color: 'var(--gold-light)', padding: '6px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, fontFamily: 'Inter' }}>
             {records.length} சேவைகள்
           </div>
