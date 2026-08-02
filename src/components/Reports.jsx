@@ -242,12 +242,12 @@ const printReceipt = (r, goldRate = '', silverRate = '') => {
       </div>
     </div>
 
-    \${(goldRate || silverRate) ? \`
+    ${(goldRate || silverRate) ? `
       <div style="display: flex; justify-content: center; gap: 24px; margin-top: 4px; margin-bottom: 4px; padding: 5px 16px; border: 1px solid rgba(15, 61, 52, 0.25); border-radius: 6px; background: #FFFDF9; font-size: 11.5px; font-weight: 700; color: #0F3D34;">
-        \${goldRate ? \`<span>Today Gold Rate (1g): ₹\${Number(goldRate).toLocaleString('en-IN')}</span>\` : ''}
-        \${silverRate ? \`<span>Today Silver Rate (1g): ₹\${Number(silverRate).toLocaleString('en-IN')}</span>\` : ''}
+        ${goldRate ? `<span>Today Gold Rate (1g): ₹${Number(goldRate).toLocaleString('en-IN')}</span>` : ''}
+        ${silverRate ? `<span>Today Silver Rate (1g): ₹${Number(silverRate).toLocaleString('en-IN')}</span>` : ''}
       </div>
-    \` : ''}
+    ` : ''}
 
     <div style="text-align: center; width: 100%;">
       <div class="invoice-title-badge" style="margin-top: 4px;">🔧 SERVICE RECEIPT / சேவை பில்</div>
