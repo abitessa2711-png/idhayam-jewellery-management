@@ -1,5 +1,5 @@
 import React from 'react'
-import { Printer, X, Phone, MapPin, Sparkles } from 'lucide-react'
+import { Printer, X, Phone, MapPin } from 'lucide-react'
 
 const BillModal = ({ bill, onClose }) => {
   if (!bill) return null
@@ -15,153 +15,219 @@ const BillModal = ({ bill, onClose }) => {
     window.print()
   }
 
+  // Convert numbers to words (Rupees in English)
+  const numberToEnglishWords = (num) => {
+    if (num === 0) return 'Rupees Zero Only'
+    const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen ']
+    const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety']
+    const g = ['', 'Thousand', 'Million', 'Billion', 'Trillion']
+
+    const check = (n) => {
+      let str = ''
+      if (n > 99) {
+        str += a[Math.floor(n / 100)] + 'Hundred '
+        n %= 100
+      }
+      if (n > 19) {
+        str += b[Math.floor(n / 10)] + ' ' + a[n % 10]
+      } else {
+        str += a[n]
+      }
+      return str
+    }
+
+    let i = 0
+    let words = ''
+    while (num > 0) {
+      let rem = num % 1000
+      if (rem > 0) {
+        words = check(rem) + g[i] + ' ' + words
+      }
+      num = Math.floor(num / 1000)
+      i++
+    }
+    return 'RUPEES ' + words.trim() + ' ONLY'
+  }
+
   return (
     <div className="modal-overlay">
       <style>{`
-        .bill-modal-box {
+        .grt-invoice-container {
           background: #FFFFFF;
           color: #0F1A17;
-          width: 740px;
+          width: 780px;
           max-width: 95vw;
-          max-height: 90vh;
+          max-height: 92vh;
           overflow-y: auto;
-          border-radius: 20px;
-          box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+          border-radius: 12px;
+          box-shadow: 0 25px 65px rgba(0,0,0,0.35);
+          border: 1px solid #C8A96A;
+          font-family: 'Noto Sans Tamil', 'Inter', sans-serif;
           position: relative;
-          border: 2px solid var(--gold);
         }
 
-        .bill-header-banner {
-          background: linear-gradient(135deg, #0F3D34 0%, #134E43 60%, #0F3D34 100%);
-          color: #FFFFFF;
-          padding: 24px 30px;
+        .invoice-sheet {
+          padding: 30px;
           position: relative;
-          text-align: center;
         }
 
-        .bill-shop-title {
-          font-family: 'Noto Sans Tamil', sans-serif;
-          font-size: 32px;
+        .invoice-header-grid {
+          display: grid;
+          grid-template-columns: 1.8fr 1fr;
+          gap: 20px;
+          border-bottom: 2px solid #0F3D34;
+          padding-bottom: 12px;
+          margin-bottom: 16px;
+        }
+
+        .shop-info-side {
+          font-size: 11.5px;
+          line-height: 1.5;
+          color: #3D5C52;
+        }
+
+        .shop-brand-name {
+          font-size: 26px;
           font-weight: 800;
-          color: #F0DFA8;
-          letter-spacing: 1px;
+          color: #0F3D34;
           margin-bottom: 2px;
-          text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        .bill-shop-sub {
-          font-family: 'Noto Sans Tamil', sans-serif;
-          font-size: 15px;
+        .shop-brand-sub {
+          font-size: 13.5px;
           font-weight: 600;
-          color: #FFFFFF;
+          color: #C8A96A;
           margin-bottom: 4px;
         }
 
-        .bill-shop-tag {
-          font-family: 'Inter', sans-serif;
-          font-size: 12px;
-          letter-spacing: 1.5px;
-          text-transform: uppercase;
-          color: #C8A96A;
-          font-weight: 600;
-          margin-bottom: 12px;
-        }
-
-        .bill-contacts {
+        .logo-side {
+          text-align: right;
           display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 18px;
-          font-size: 13px;
-          font-weight: 600;
-          color: #E6F0E9;
-          font-family: 'Inter', sans-serif;
-          background: rgba(0,0,0,0.20);
-          padding: 6px 16px;
-          border-radius: 20px;
-          width: fit-content;
-          margin: 0 auto;
-        }
-
-        .bill-meta-bar {
-          background: #EBF4ED;
-          padding: 16px 30px;
-          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
           justify-content: space-between;
-          border-bottom: 1px solid rgba(63, 132, 81, 0.15);
-          font-size: 13.5px;
         }
 
-        .bill-badge-item {
-          font-family: 'Noto Sans Tamil', 'Inter', sans-serif;
-          line-height: 1.5;
+        .invoice-title-badge {
+          font-size: 15px;
+          font-weight: 700;
+          color: #0F3D34;
+          border: 1.5px solid #0F3D34;
+          padding: 3px 12px;
+          border-radius: 4px;
+          letter-spacing: 1px;
+          margin-top: 4px;
+          display: inline-block;
+          text-transform: uppercase;
         }
 
-        .bill-highlights {
-          background: #FFF9EE;
-          border: 1px dashed #C8A96A;
-          border-radius: 10px;
-          padding: 10px 16px;
-          margin: 16px 30px;
-          display: flex;
-          justify-content: space-around;
-          font-size: 12px;
-          color: #3F8451;
-          font-weight: 600;
-          font-family: 'Noto Sans Tamil', sans-serif;
+        .customer-invoice-meta {
+          display: grid;
+          grid-template-columns: 1.5fr 1fr;
+          gap: 20px;
+          font-size: 12.5px;
+          padding: 8px 12px;
+          background: #F7F6F1;
+          border: 1px solid rgba(15, 61, 52, 0.12);
+          border-radius: 8px;
+          margin-bottom: 16px;
         }
 
-        .bill-table-container {
-          padding: 0 30px 16px;
+        .meta-col-right {
+          text-align: right;
+          line-height: 1.6;
         }
 
-        .bill-table {
+        .grt-table {
           width: 100%;
           border-collapse: collapse;
-          margin-top: 10px;
-          font-size: 13.5px;
+          margin-bottom: 18px;
+          font-size: 12.5px;
         }
 
-        .bill-table th {
-          background: #0F3D34 !important;
-          color: #F0DFA8 !important;
-          font-weight: 600;
-          padding: 10px 14px;
-          font-size: 12px;
+        .grt-table th {
+          background: #EBF4ED !important;
+          color: #0F3D34 !important;
+          border-top: 1.5px solid #0F3D34;
+          border-bottom: 1.5px solid #0F3D34;
+          padding: 8px 10px;
+          font-weight: 700;
           text-transform: uppercase;
+          font-size: 11px;
         }
 
-        .bill-table td {
-          padding: 11px 14px;
-          border-bottom: 1px solid rgba(63, 132, 81, 0.12);
+        .grt-table td {
+          padding: 10px;
+          border-bottom: 1px solid rgba(15, 61, 52, 0.08);
+          vertical-align: middle;
         }
 
-        .bill-totals-box {
-          margin: 16px 30px 24px;
-          background: #EBF4ED;
-          border-radius: 14px;
-          padding: 16px 22px;
+        .grt-summary-grid {
+          display: grid;
+          grid-template-columns: 1.2fr 1fr;
+          gap: 24px;
+          font-size: 12px;
+          border-top: 1.5px solid #0F3D34;
+          padding-top: 12px;
+          margin-bottom: 24px;
+        }
+
+        .totals-block {
+          background: #F7F6F1;
+          border-radius: 8px;
+          border: 1px solid rgba(15, 61, 52, 0.12);
+          padding: 12px 16px;
+        }
+
+        .totals-row {
           display: flex;
           justify-content: space-between;
-          align-items: center;
-          border: 1px solid rgba(63, 132, 81, 0.20);
+          padding: 5px 0;
+          font-weight: 500;
         }
 
-        .bill-footer-address {
-          text-align: center;
-          padding: 14px 30px;
-          background: #F7F6F1;
-          border-top: 1px solid rgba(63, 132, 81, 0.15);
+        .totals-row.grand-total {
+          border-top: 1.5px double #0F3D34;
+          margin-top: 6px;
+          padding-top: 8px;
+          font-size: 15px;
+          font-weight: 800;
+          color: #0F3D34;
+        }
+
+        .signature-section {
+          display: flex;
+          justify-content: space-between;
+          margin-top: 36px;
+          padding: 0 20px;
           font-size: 12px;
-          color: #2E5242;
-          font-family: 'Noto Sans Tamil', sans-serif;
+          font-weight: 600;
+          color: #3D5C52;
+        }
+
+        .signature-line {
+          border-top: 1px solid #0F3D34;
+          width: 140px;
+          text-align: center;
+          padding-top: 6px;
+          margin-top: 32px;
+        }
+
+        .thank-you-brand {
+          text-align: center;
+          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-size: 28px;
+          font-weight: 700;
+          color: #C8A96A;
+          margin: 16px 0;
+          opacity: 0.95;
         }
 
         @media print {
           body * {
             visibility: hidden;
           }
-          .modal-overlay, .bill-modal-box, .bill-modal-box * {
+          .modal-overlay, .grt-invoice-container, .grt-invoice-container * {
             visibility: visible;
           }
           .modal-overlay {
@@ -171,7 +237,7 @@ const BillModal = ({ bill, onClose }) => {
             background: #FFFFFF !important;
             padding: 0 !important;
           }
-          .bill-modal-box {
+          .grt-invoice-container {
             box-shadow: none !important;
             border: none !important;
             width: 100% !important;
@@ -185,15 +251,15 @@ const BillModal = ({ bill, onClose }) => {
         }
       `}</style>
 
-      <div className="bill-modal-box animate-fade-in" onClick={e => e.stopPropagation()}>
-
-        {/* Action Header bar (no-print) */}
+      <div className="grt-invoice-container animate-fade-in" onClick={e => e.stopPropagation()}>
+        
+        {/* Top Control Bar (Hidden when printing) */}
         <div className="no-print" style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           padding: '12px 24px', background: '#0F3D34', borderBottom: '1px solid rgba(255,255,255,0.1)'
         }}>
-          <span style={{ color: '#F0DFA8', fontWeight: 600, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Sparkles size={16} /> விற்பனை பில் அச்சு (Print Invoice)
+          <span style={{ color: '#F0DFA8', fontWeight: 600, fontSize: '13.5px' }}>
+            🧾 பில் அச்சு வடிவம் (Invoice Print Preview)
           </span>
           <div style={{ display: 'flex', gap: '10px' }}>
             <button
@@ -219,118 +285,138 @@ const BillModal = ({ bill, onClose }) => {
           </div>
         </div>
 
-        {/* Printable Invoice Document */}
-        <div id="printable-bill">
-          {/* Header Banner */}
-          <div className="bill-header-banner">
-            <div className="bill-shop-title">இதயம்</div>
-            <div className="bill-shop-sub">ஜூவல்லரி &amp; நகை தொழிலகம்</div>
-            <div className="bill-shop-tag">Wholesale &amp; Retail Shop</div>
-            <div className="bill-contacts">
-              <span><Phone size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} /> 95979 76729</span>
-              <span>•</span>
-              <span>73391 60876</span>
-              <span>•</span>
-              <span>81480 03454</span>
+        {/* Printable Invoice Sheet */}
+        <div className="invoice-sheet">
+          
+          {/* Header Section */}
+          <div className="invoice-header-grid">
+            <div className="shop-info-side">
+              <div style={{ fontSize: '11px', color: '#6A9A80', fontWeight: 600 }}>TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4</div>
+              <div className="shop-brand-name">இதயம்</div>
+              <div className="shop-brand-sub">ஜூவல்லரி &amp; நகை தொழிலகம்</div>
+              <div style={{ fontWeight: 600 }}>Wholesale &amp; Retail Shop</div>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '3px' }}>
+                <MapPin size={11} color="var(--gold)" />
+                8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி.
+              </div>
+            </div>
+            <div className="logo-side">
+              <div style={{ fontWeight: 600, fontSize: '12px', color: '#0F3D34' }}>
+                <Phone size={11} style={{ display: 'inline', marginRight: '4px' }} />
+                95979 76729 | 81480 03454
+              </div>
+              <div className="invoice-title-badge">CASH BILL / TAX INVOICE</div>
             </div>
           </div>
 
-          {/* Meta Info Bar */}
-          <div className="bill-meta-bar">
-            <div className="bill-badge-item">
-              <span style={{ color: '#6A9A80', fontSize: '11px', textTransform: 'uppercase' }}>வாடிக்கையாளர் (Customer):</span><br />
-              <strong style={{ fontSize: '16px', color: '#0F3D34' }}>{bill.customerName || 'Walk-in Customer'}</strong>
-              {bill.mobile && <span style={{ marginLeft: '10px', color: '#3D5C52', fontSize: '12px' }}>({bill.mobile})</span>}
+          {/* Customer & Invoice Meta Details */}
+          <div className="customer-invoice-meta">
+            <div>
+              <span style={{ color: '#6A9A80', fontSize: '11px' }}>வாடிக்கையாளர் விவரம் / Customer Info:</span>
+              <div style={{ fontSize: '15px', fontWeight: 700, color: '#0F3D34', marginTop: '2px' }}>
+                {bill.customerName || 'Walk-in Customer'}
+              </div>
+              {bill.mobile && <div style={{ color: '#3D5C52', marginTop: '2px' }}>Ph: {bill.mobile}</div>}
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <span style={{ color: '#6A9A80', fontSize: '11px' }}>பில் எண் (Invoice No):</span>{' '}
-              <strong style={{ color: '#0F3D34' }}>IDH-{bill.id || Date.now().toString().slice(-6)}</strong><br />
-              <span style={{ color: '#6A9A80', fontSize: '11px' }}>தேதி (Date):</span>{' '}
-              <strong style={{ color: '#0F3D34' }}>{bill.date ? new Date(bill.date).toLocaleString('en-IN') : new Date().toLocaleString('en-IN')}</strong>
+            <div className="meta-col-right">
+              <div><b>பில் எண் / Bill No:</b> IDH-{bill.id ? bill.id.toString().slice(-6) : Date.now().toString().slice(-6)}</div>
+              <div><b>தேதி / Date:</b> {bill.date ? new Date(bill.date).toLocaleString('en-IN') : new Date().toLocaleString('en-IN')}</div>
             </div>
-          </div>
-
-          {/* Highlights from Visiting Card */}
-          <div className="bill-highlights">
-            <span>✨ 926 நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்</span>
-            <span>•</span>
-            <span>✨ வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை</span>
           </div>
 
           {/* Items Table */}
-          <div className="bill-table-container">
-            <table className="bill-table">
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'left' }}>பொருள் (Item Description)</th>
-                  <th style={{ textAlign: 'center' }}>எண்ணிக்கை (Qty)</th>
-                  <th style={{ textAlign: 'right' }}>எடை (Weight)</th>
-                  <th style={{ textAlign: 'right' }}>மதிப்பு (Gross)</th>
-                  <th style={{ textAlign: 'right' }}>தள்ளுபடி (Disc)</th>
-                  <th style={{ textAlign: 'right' }}>மொத்தம் (Net Amt)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item, idx) => {
-                  const gross = item.grossAmount || item.subtotal || item.total || 0
-                  const disc = item.discountAmount || 0
-                  const net = item.total || (gross - disc)
-                  return (
-                    <tr key={idx}>
-                      <td>
-                        <strong style={{ color: '#0F3D34', fontFamily: "'Noto Sans Tamil', 'Inter', sans-serif" }}>
-                          {item.variant || item.subcategory || item.category}
-                        </strong>
-                        <div style={{ fontSize: '11px', color: '#6A9A80' }}>
-                          {item.category} {item.detail ? `· ${item.detail}` : ''}
-                        </div>
-                      </td>
-                      <td style={{ textAlign: 'center', fontWeight: 600 }}>{item.quantity || 1} pcs</td>
-                      <td style={{ textAlign: 'right', fontWeight: 600, color: '#A6834A' }}>{(item.weight || 0).toFixed(3)} g</td>
-                      <td style={{ textAlign: 'right', color: '#3D5C52' }}>₹{Number(gross).toLocaleString('en-IN')}</td>
-                      <td style={{ textAlign: 'right', color: '#C0392B' }}>
-                        {disc > 0 ? `-₹${Number(disc).toLocaleString('en-IN')}` : '—'}
-                      </td>
-                      <td style={{ textAlign: 'right', fontWeight: 700, color: '#1A7A4A' }}>
-                        ₹{Number(net).toLocaleString('en-IN')}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+          <table className="grt-table">
+            <thead>
+              <tr>
+                <th style={{ textAlign: 'left', width: '38%' }}>விவரம் (Description)</th>
+                <th style={{ textAlign: 'center', width: '10%' }}>எண்ணிக்கை (Qty)</th>
+                <th style={{ textAlign: 'right', width: '13%' }}>எடை (Gross Wt)</th>
+                <th style={{ textAlign: 'right', width: '13%' }}>மதிப்பு (Gross Rs)</th>
+                <th style={{ textAlign: 'right', width: '12%' }}>தள்ளுபடி (Disc)</th>
+                <th style={{ textAlign: 'right', width: '14%' }}>நிகர மதிப்பு (Net Value)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item, idx) => {
+                const gross = item.grossAmount || item.subtotal || item.total || 0
+                const disc = item.discountAmount || 0
+                const net = item.total || (gross - disc)
+                return (
+                  <tr key={idx}>
+                    <td>
+                      <strong style={{ color: '#0F3D34' }}>
+                        {item.variant || item.subcategory || item.category}
+                      </strong>
+                      <div style={{ fontSize: '10.5px', color: '#6A9A80' }}>
+                        {item.category} {item.detail ? `· ${item.detail}` : ''}
+                      </div>
+                    </td>
+                    <td style={{ textAlign: 'center', fontWeight: 600 }}>{item.quantity || 1} pcs</td>
+                    <td style={{ textAlign: 'right', fontWeight: 600, color: '#A6834A' }}>{(item.weight || 0).toFixed(3)} g</td>
+                    <td style={{ textAlign: 'right' }}>₹{Number(gross).toLocaleString('en-IN')}</td>
+                    <td style={{ textAlign: 'right', color: '#C0392B' }}>
+                      {disc > 0 ? `₹${Number(disc).toLocaleString('en-IN')}` : '—'}
+                    </td>
+                    <td style={{ textAlign: 'right', fontWeight: 700, color: '#1A7A4A' }}>
+                      ₹{Number(net).toLocaleString('en-IN')}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
 
-          {/* Grand Totals Box */}
-          <div className="bill-totals-box">
-            <div>
-              <div style={{ fontSize: '12px', color: '#3D5C52', fontFamily: "'Noto Sans Tamil', sans-serif" }}>
-                மொத்த எண்ணிக்கை: <strong>{totalQty} pcs</strong> &nbsp;|&nbsp; மொத்த எடை: <strong>{totalWeight.toFixed(3)} g</strong>
+          {/* Summary & Signatures Section */}
+          <div className="grt-summary-grid">
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div style={{ fontSize: '11px', color: '#6A9A80', lineHeight: '1.6' }}>
+                <b>குறிப்பு / Terms:</b><br />
+                • 926 நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.<br />
+                • வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை.<br />
+                • சேதங்கள் ஏதும் இருப்பின் 2 நாட்களுக்குள் தெரிவிக்கவும்.
+              </div>
+              <div style={{ marginTop: '12px' }}>
+                <span style={{ fontSize: '10px', color: '#6A9A80', display: 'block', fontWeight: 600 }}>ரூபாய் வார்த்தைகளில் / Amount in words:</span>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#0F3D34' }}>{numberToEnglishWords(netTotal)}</span>
+              </div>
+            </div>
+            
+            <div className="totals-block">
+              <div className="totals-row">
+                <span style={{ color: '#6A9A80' }}>மொத்த மதிப்பு (Sub Total):</span>
+                <span>₹{totalGross.toLocaleString('en-IN')}</span>
               </div>
               {totalDiscount > 0 && (
-                <div style={{ fontSize: '12px', color: '#C0392B', marginTop: '4px', fontWeight: 600 }}>
-                  மொத்த தள்ளுபடி (Total Savings): -₹{totalDiscount.toLocaleString('en-IN')}
+                <div className="totals-row" style={{ color: '#C0392B' }}>
+                  <span>மொத்த தள்ளுபடி (Less Discount):</span>
+                  <span>-₹{totalDiscount.toLocaleString('en-IN')}</span>
                 </div>
               )}
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '11px', color: '#6A9A80', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
-                செலுத்த வேண்டிய நிகர தொகை (NET AMOUNT)
+              <div className="totals-row">
+                <span style={{ color: '#6A9A80' }}>மொத்த எடை (Total Weight):</span>
+                <span style={{ fontWeight: 600 }}>{totalWeight.toFixed(3)} g</span>
               </div>
-              <div style={{ fontSize: '26px', fontWeight: 800, color: '#0F3D34', fontFamily: 'Inter, sans-serif' }}>
-                ₹{netTotal.toLocaleString('en-IN')}
+              <div className="totals-row">
+                <span style={{ color: '#6A9A80' }}>மொத்த எண்ணிக்கை (Total Qty):</span>
+                <span style={{ fontWeight: 600 }}>{totalQty} pcs</span>
+              </div>
+              <div className="totals-row grand-total">
+                <span>பில் தொகை (Bill Amount):</span>
+                <span>₹{netTotal.toLocaleString('en-IN')}</span>
               </div>
             </div>
           </div>
 
-          {/* Footer Address & Terms */}
-          <div className="bill-footer-address">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontWeight: 700, color: '#0F3D34', marginBottom: '4px' }}>
-              <MapPin size={14} color="#C8A96A" /> 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி.
-            </div>
-            <div style={{ fontSize: '11px', color: '#6A9A80', marginTop: '4px' }}>
-              நன்றி! மீண்டும் வருக! (Thank you for shopping with Idhayam Jewellery)
-            </div>
+          {/* Thank You Brand Signature */}
+          <div className="thank-you-brand">
+            Thank You
+          </div>
+
+          {/* Bottom Signature Section */}
+          <div className="signature-section">
+            <div className="signature-line">Customer Signature</div>
+            <div className="signature-line">Cashier</div>
+            <div className="signature-line">Salesman</div>
           </div>
 
         </div>
