@@ -79,12 +79,12 @@ const printReceipt = (r) => {
     
     .invoice-header-grid {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      text-align: center;
+      gap: 24px;
       border-bottom: 2px solid #0F3D34;
-      padding-bottom: 14px;
+      padding-bottom: 16px;
       margin-bottom: 16px;
+      text-align: left;
     }
     .shop-info-side {
       font-size: 11.5px;
@@ -225,16 +225,23 @@ const printReceipt = (r) => {
       @page{margin:6mm;size:auto}
     }
   </style></head><body>
-  <div class="invoice-header-grid">
-    <div style="display: flex; justify-content: center; margin-bottom: 4px">
-      <img src="${logoUrl}" alt="இதயம் ஜூவல்லரி" style="height: 75px; object-fit: contain" />
+  <div class="invoice-header-grid" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+    <div style="display: flex; align-items: center; gap: 20px; flex: 1;">
+      <img src="${logoUrl}" alt="இதயம் ஜூவல்லரி" style="height: 75px; object-fit: contain;" />
+      <div>
+        <div style="font-size: 23px; font-weight: 800; color: #0F3D34; font-family: 'Noto Sans Tamil', sans-serif; letter-spacing: 0.3px; line-height: 1.2;">
+          இதயம் ஜூவல்லரி &amp; நகை தொழிலகம்
+        </div>
+        <div style="font-size: 12.5px; font-weight: 600; color: #C8A96A; margin: 2px 0;">
+          Idhayam Jewellery &amp; Works (Wholesale &amp; Retail Shop)
+        </div>
+        <div style="font-size: 11px; color: #6A9A80; line-height: 1.4;">
+          TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4<br />
+          📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி. &nbsp;|&nbsp; 📞 95979 76729 | 81480 03454
+        </div>
+      </div>
     </div>
-    <div style="font-size: 11.5px; color: #3D5C52; line-height: 1.6">
-      <span style="font-weight: 600; color: #6A9A80">TIN No: 33496087612 | GSTIN: 33AAIF17856A1Z4</span><br />
-      <span style="font-weight: 600">📍 8 - வடக்கு ரத வீதி, டவுன் போலீஸ் ஸ்டேஷன் ரோடு, சிவகாசி.</span> &nbsp;|&nbsp;&nbsp;
-      <span style="font-weight: 600">📞 95979 76729 | 81480 03454</span>
-    </div>
-    <div>
+    <div style="text-align: right; flex-shrink: 0;">
       <div class="invoice-title-badge">🔧 SERVICE RECEIPT / சேவை பில்</div>
     </div>
   </div>
