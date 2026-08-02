@@ -7,7 +7,6 @@ import AddStock       from './components/AddStock'
 import SellDashboard  from './components/SellDashboard'
 import Reports        from './components/Reports'
 import Dashboard      from './components/Dashboard'
-import AuditPage      from './components/AuditPage'
 import SoldItems      from './components/SoldItems'
 import StockDashboard from './components/StockDashboard'
 import { supabase }   from './supabaseClient'
@@ -186,11 +185,6 @@ export default function App() {
       if (user.role !== 'admin' && adminOnlyTabs.includes(activeTab)) {
         setActiveTab('stock')
       }
-      
-      const auditorForbiddenTabs = ['dashboard', 'sold', 'reports', 'old_buyback']
-      if (user.role === 'auditor' && auditorForbiddenTabs.includes(activeTab)) {
-        setActiveTab('stock')
-      }
     }
   }, [user, activeTab])
 
@@ -331,7 +325,7 @@ export default function App() {
 
   // ── Sales (Process sale, deduct stock, log history) ───────────────────────
   const processSale = async (customerName, mobile, cartItems, customDate) => {
-    const billId = `TAS-${Date.now()}`
+    const billId = `IDH-${Date.now()}`
     const date = customDate || new Date().toISOString()
 
     for (const item of cartItems) {
@@ -427,7 +421,6 @@ export default function App() {
     sell:      <SellDashboard  products={products}   processSale={processSale} />,
     sold:        <SoldItems      soldItems={soldItems} />,
     old_buyback: <OldBuyback     buybacks={buybacks}   onAddBuyback={addBuyback} onDeleteBuyback={deleteBuyback} />,
-    audit:       <AuditPage      products={products}   soldItems={soldItems} ledger={ledger} />,
     reports:     <Reports        products={products}   soldItems={soldItems} role={user?.role} deleteProduct={deleteProduct} />
   }
 

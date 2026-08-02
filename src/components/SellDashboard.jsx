@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import { MASTER_DATA } from '../data/masterData'
-import { ShoppingCart, User, CreditCard, Trash2, Eye } from 'lucide-react'
+import { ShoppingCart, User, CreditCard, Trash2, Eye, Printer, PlusCircle, Scale, Tag, IndianRupee } from 'lucide-react'
 import BillModal from './BillModal'
 
 const CATEGORIES = Object.keys(MASTER_DATA)
 
 const SellDashboard = ({ products = [], processSale }) => {
   const [formData, setFormData] = useState({
-    category: '', subcategory: '', variant: '', detail: '', weight: '', quantity: '', rate: '', discountAmt: '', gstAmt: ''
+    category: '', subcategory: '', variant: '', detail: '', weight: '', quantity: '', grossAmount: '', discountAmt: ''
   })
   const [customer, setCustomer] = useState({ name: '', mobile: '' })
   const [cart, setCart] = useState([])
@@ -27,15 +27,12 @@ const SellDashboard = ({ products = [], processSale }) => {
     return Array.isArray(d) ? d : (typeof d === 'object' ? Object.keys(d) : [])
   }
 
-  // Helper to determine product category emoji for premium look
   const getCategoryEmoji = (cat) => {
     if (cat?.toLowerCase().includes('gold') || cat?.toLowerCase().includes('தங்கம்')) return '🟡'
     if (cat?.toLowerCase().includes('silver') || cat?.toLowerCase().includes('வெள்ளி')) return '⚪'
     return '📦'
   }
 
-  // Derived: Filter products based on selected dropdown hierarchy.
-  // If no category/subcategory/variant is selected, we include all available stocks.
   const matchingStocks = products.filter(p => {
     if (formData.category && p.category !== formData.category) return false
     if (formData.subcategory && p.subcategory !== formData.subcategory) return false
@@ -44,35 +41,36 @@ const SellDashboard = ({ products = [], processSale }) => {
   })
 
   const filteredStocks = matchingStocks.filter(s => {
-    if (!weightSearch) return true;
-    const searchVal = weightSearch.trim().toLowerCase();
-    return s.weight.toString().includes(searchVal) || 
-           s.weight.toFixed(3).includes(searchVal) || 
+    if (!weightSearch) return true
+    const searchVal = weightSearch.trim().toLowerCase()
+    return s.weight.toString().includes(searchVal) ||
+           s.weight.toFixed(3).includes(searchVal) ||
            (s.detail && s.detail.toLowerCase().includes(searchVal)) ||
-           s.id.toString() === searchVal;
-  });
+           s.id.toString() === searchVal
+  })
 
   const availableStock = products.find(p => p.id === parseInt(selectedStockId))
 
   const handleReset = () => {
     setFormData({
-      category: '', subcategory: '', variant: '', detail: '', weight: '', quantity: '', rate: '', discountAmt: '', gstAmt: ''
+      category: '', subcategory: '', variant: '', detail: '', weight: '', quantity: '', grossAmount: '', discountAmt: ''
     })
     setSelectedStockId('')
     setWeightSearch('')
   }
 
-  const weight = parseFloat(formData.weight || 0)
-  const rate = parseFloat(formData.rate || 0)
-  const finalItemTotal = weight * rate
+  // Calculated preview values
+  const grossVal = parseFloat(formData.grossAmount || 0)
+  const discVal  = parseFloat(formData.discountAmt || 0)
+  const netVal   = Math.max(0, grossVal - discVal)
 
   const addToCart = () => {
     const w = parseFloat(formData.weight || 0)
     const q = parseInt(formData.quantity || 0)
-    const r = 0
-    const dAmt = 0
-    const gAmt = 0
-    
+    const gross = parseFloat(formData.grossAmount || 0)
+    const disc  = parseFloat(formData.discountAmt || 0)
+    const net   = Math.max(0, gross - disc)
+
     if (!selectedStockId || !availableStock) {
       alert('இந்த பொருள் இருப்பில் இல்லை')
       return
@@ -93,35 +91,36 @@ const SellDashboard = ({ products = [], processSale }) => {
       }
     }
 
-    const sub = w * r
-    const total = sub - dAmt + gAmt
-
-    setCart([...cart, { 
-      ...formData, 
+    setCart([...cart, {
+      ...formData,
       productId: availableStock.id,
-      weight: w, 
-      quantity: q,
-      pricePerGram: r,
-      subtotal: sub,
-      discountAmount: dAmt,
-      gstAmount: gAmt,
-      total: total 
+      weight: w,
+      quantity: q || 1,
+      grossAmount: gross,
+      discountAmount: disc,
+      total: net,
+      pricePerGram: w > 0 ? (gross / w) : 0
     }])
-    
-    // Reset selection part
-    setFormData({ ...formData, weight: '', quantity: '', rate: '', discountAmt: '' })
+
+    setFormData({ ...formData, weight: '', quantity: '', grossAmount: '', discountAmt: '' })
     setSelectedStockId('')
     setWeightSearch('')
   }
 
-  const handleSale = async () => {
+  const handleSale = async (shouldPrint = false) => {
     if (!cart.length) return
     setLoading(true)
     try {
       const selectedIsoDate = new Date(saleDate).toISOString()
       const bill = await processSale(customer.name || 'Walk-in', customer.mobile, cart, selectedIsoDate)
-      setShowBill(bill)
+
       setLastBill(bill)
+      if (shouldPrint) {
+        setShowBill(bill)
+      } else {
+        alert('விற்பனை வெற்றிகரமாக பதிவு செய்யப்பட்டது! (Sale logged successfully)')
+      }
+
       setCart([])
       setCustomer({ name: '', mobile: '' })
       setSaleDate(new Date().toLocaleString('sv-SE').slice(0, 16).replace(' ', 'T'))
@@ -132,41 +131,44 @@ const SellDashboard = ({ products = [], processSale }) => {
     }
   }
 
-  const cartTotal = cart.reduce((s, i) => s + i.total, 0)
+  const cartGrossTotal = cart.reduce((s, i) => s + (i.grossAmount || i.total || 0), 0)
+  const cartDiscTotal  = cart.reduce((s, i) => s + (i.discountAmount || 0), 0)
+  const cartNetTotal   = cart.reduce((s, i) => s + (i.total || 0), 0)
 
   return (
     <div className="animate-fade-in">
       <div className="flex-between mb-16">
         <div>
-          <h2 style={{ fontSize: '24px', fontWeight: 700 }}>விற்பனை & பில்</h2>
-          <p className="text-sub">Process customer sales and generate bills</p>
+          <h2 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--primary)' }}>விற்பனை &amp; பில்</h2>
+          <p className="text-sub">Process customer sales and generate professional invoices</p>
         </div>
         <div className="flex" style={{ gap: '10px' }}>
           {lastBill && (
-            <button className="btn btn-secondary" onClick={() => setShowBill(lastBill)}>
+            <button className="btn btn-ghost" onClick={() => setShowBill(lastBill)} style={{ gap: '6px' }}>
               <Eye size={16} /> கடைசி பில் (View Last Bill)
             </button>
           )}
-          <div className="stat-icon" style={{ background: 'var(--accent)18', color: 'var(--accent)' }}>
-            <ShoppingCart size={24} />
+          <div className="stat-icon" style={{ background: 'var(--soft-fern)', color: '#fff' }}>
+            <ShoppingCart size={22} />
           </div>
         </div>
       </div>
 
       <div className="sell-layout-grid">
-        {/* Sale Form */}
-        <div className="card">
+        {/* Item Selection Form */}
+        <div className="card" style={{ border: '1.5px solid rgba(90,160,109,0.25)' }}>
           <div className="flex-between mb-12">
             <div className="card-title" style={{ margin: 0 }}>பொருள் தேர்வு (Item Selection)</div>
-            <button 
-              type="button" 
-              className="btn btn-secondary" 
-              style={{ fontSize: '11px', padding: '4px 8px', height: 'auto' }}
+            <button
+              type="button"
+              className="btn btn-ghost"
+              style={{ fontSize: '11px', padding: '4px 10px', height: 'auto' }}
               onClick={handleReset}
             >
               Reset Filters / Clear
             </button>
           </div>
+
           <div className="form-grid form-grid-2col">
             <div className="form-group">
               <label>பிரிவு (Category)</label>
@@ -204,32 +206,32 @@ const SellDashboard = ({ products = [], processSale }) => {
 
             {matchingStocks.length > 0 && (
               <div className="form-group grid-span-2">
-                <label>இருப்புத் தேடல் (எடை/விவரம்/ID மூலம் தேட) / Search Stock (by Weight/Detail/ID)</label>
-                <input 
-                  type="text" 
-                  placeholder="எடை, விவரம் அல்லது ID-ஐ தட்டச்சு செய்யவும்..." 
-                  value={weightSearch} 
+                <label>இருப்புத் தேடல் (எடை/விவரம்/ID மூலம் தேட) / Search Stock</label>
+                <input
+                  type="text"
+                  placeholder="எடை, விவரம் அல்லது ID தட்டச்சு செய்யவும்..."
+                  value={weightSearch}
                   onChange={e => {
-                    const val = e.target.value;
-                    setWeightSearch(val);
-                    const matches = matchingStocks.filter(s => 
-                      s.weight.toString().includes(val) || 
+                    const val = e.target.value
+                    setWeightSearch(val)
+                    const matches = matchingStocks.filter(s =>
+                      s.weight.toString().includes(val) ||
                       s.weight.toFixed(3).includes(val) ||
                       (s.detail && s.detail.toLowerCase().includes(val.toLowerCase())) ||
                       s.id.toString() === val
-                    );
+                    )
                     if (matches.length === 1) {
-                      const s = matches[0];
-                      setSelectedStockId(s.id.toString());
-                      setFormData({ 
-                        ...formData, 
+                      const s = matches[0]
+                      setSelectedStockId(s.id.toString())
+                      setFormData({
+                        ...formData,
                         category: s.category,
                         subcategory: s.subcategory,
                         variant: s.variant,
-                        detail: s.detail, 
-                        weight: s.weight.toString(), 
-                        quantity: "1" 
-                      });
+                        detail: s.detail,
+                        weight: s.weight.toString(),
+                        quantity: "1"
+                      })
                     }
                   }}
                 />
@@ -239,19 +241,19 @@ const SellDashboard = ({ products = [], processSale }) => {
             <div className="form-group grid-span-2">
               <label>இருப்புத் தெரிவு (Select Specific Stock) <span style={{ color: 'red' }}>*</span></label>
               <select value={selectedStockId} onChange={e => {
-                const id = e.target.value;
-                setSelectedStockId(id);
-                const s = products.find(p => p.id === parseInt(id));
+                const id = e.target.value
+                setSelectedStockId(id)
+                const s = products.find(p => p.id === parseInt(id))
                 if (s) {
-                  setFormData({ 
-                    ...formData, 
+                  setFormData({
+                    ...formData,
                     category: s.category,
                     subcategory: s.subcategory,
                     variant: s.variant,
-                    detail: s.detail, 
-                    weight: s.weight.toString(), 
-                    quantity: "1" 
-                  });
+                    detail: s.detail,
+                    weight: s.weight.toString(),
+                    quantity: "1"
+                  })
                 }
               }} disabled={matchingStocks.length === 0}>
                 <option value="">— {matchingStocks.length > 0 ? 'Select Stock Entry' : 'No Stock Available'} —</option>
@@ -265,132 +267,109 @@ const SellDashboard = ({ products = [], processSale }) => {
 
             {matchingStocks.length > 0 && (
               <div className="grid-span-2" style={{ marginTop: '-4px', marginBottom: '8px' }}>
-                <label style={{ fontSize: '12px', color: 'var(--text-sub)', marginBottom: '6px' }}>
-                  இருப்பில் உள்ள பொருட்கள் (Available Items - Click to select):
+                <label style={{ fontSize: '12px', color: 'var(--text-sub)', marginBottom: '6px', display: 'block' }}>
+                  இருப்பில் உள்ள பொருட்கள் (Click to select):
                 </label>
-                <div style={{ 
-                  display: 'flex', 
-                  flexWrap: 'wrap', 
-                  gap: '8px', 
-                  maxHeight: '150px', 
-                  overflowY: 'auto', 
-                  padding: '8px', 
-                  background: 'rgba(255,255,255,0.02)', 
-                  border: '1px solid var(--border)', 
-                  borderRadius: '10px' 
+                <div style={{
+                  display: 'flex', flexWrap: 'wrap', gap: '8px', maxHeight: '140px', overflowY: 'auto',
+                  padding: '8px', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '10px'
                 }}>
                   {filteredStocks.slice(0, 50).map(s => {
-                    const isSelected = selectedStockId === s.id.toString();
+                    const isSelected = selectedStockId === s.id.toString()
                     return (
                       <button
                         key={s.id}
                         type="button"
                         onClick={() => {
-                          setSelectedStockId(s.id.toString());
-                          setFormData({ 
-                            ...formData, 
+                          setSelectedStockId(s.id.toString())
+                          setFormData({
+                            ...formData,
                             category: s.category,
                             subcategory: s.subcategory,
                             variant: s.variant,
-                            detail: s.detail, 
-                            weight: s.weight.toString(), 
-                            quantity: "1" 
-                          });
+                            detail: s.detail,
+                            weight: s.weight.toString(),
+                            quantity: "1"
+                          })
                         }}
                         style={{
-                          background: isSelected ? 'rgba(197, 160, 94, 0.2)' : 'rgba(255, 255, 255, 0.03)',
-                          border: isSelected ? '1px solid var(--gold)' : '1px solid var(--border)',
-                          color: isSelected ? 'var(--gold)' : 'var(--text-main)',
-                          padding: '4px 10px',
-                          borderRadius: '6px',
-                          fontSize: '12px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          transition: 'all 0.15s ease',
-                          fontWeight: isSelected ? 600 : 500
+                          background: isSelected ? 'var(--primary)' : '#fff',
+                          border: isSelected ? '1px solid var(--primary)' : '1px solid var(--border)',
+                          color: isSelected ? '#F0DFA8' : 'var(--text-main)',
+                          padding: '4px 10px', borderRadius: '6px', fontSize: '12px',
+                          cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
+                          transition: 'all 0.15s ease', fontWeight: isSelected ? 600 : 500
                         }}
-                        className="stock-select-badge"
                       >
-                        <span style={{ color: isSelected ? 'var(--gold)' : 'var(--text-sub)', fontSize: '10px' }}>#{s.id}</span>
+                        <span style={{ fontSize: '10px', opacity: 0.8 }}>#{s.id}</span>
                         <span>{getCategoryEmoji(s.category)} {s.variant || s.subcategory || s.category}: {s.weight}g</span>
-                        {s.quantity > 1 && <span style={{ opacity: 0.8 }}>({s.quantity} pcs)</span>}
-                        {s.detail && <span style={{ opacity: 0.6, fontSize: '11px' }}>- {s.detail}</span>}
                       </button>
-                    );
+                    )
                   })}
-                  {filteredStocks.length > 50 && (
-                    <div style={{ width: '100%', color: 'var(--text-sub)', fontSize: '11px', textAlign: 'center', marginTop: '4px' }}>
-                      மேலும் {filteredStocks.length - 50} பொருட்கள் உள்ளன, எடையை இன்னும் தெளிவாக தட்டச்சு செய்யவும் (Type more digits to filter)
-                    </div>
-                  )}
-                  {filteredStocks.length === 0 && (
-                    <div style={{ color: 'var(--text-sub)', fontSize: '12px', padding: '4px' }}>பொருந்தும் இருப்புகள் எதுவும் இல்லை (No matching stocks)</div>
-                  )}
                 </div>
               </div>
             )}
 
-            {availableStock && (
-              <div className="grid-span-2" style={{ marginTop: '-8px', marginBottom: '8px', fontSize: '13px', background: 'rgba(255,255,255,0.03)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                <span style={{ color: 'var(--text-sub)' }}>
-                  இருப்பில் உள்ளது (Click to fill):{' '}
-                  <span 
-                    style={{ cursor: 'pointer', background: 'rgba(197, 160, 94, 0.15)', color: 'var(--gold)', padding: '2px 6px', borderRadius: '4px', marginRight: '6px', fontWeight: 600 }}
-                    onClick={() => setFormData({ ...formData, weight: availableStock.weight.toString() })}
-                    title="Use Weight"
-                  >
-                    {availableStock.weight}g
-                  </span>
-                  |{' '}
-                  <span 
-                    style={{ cursor: 'pointer', background: 'rgba(197, 160, 94, 0.15)', color: 'var(--gold)', padding: '2px 6px', borderRadius: '4px', marginLeft: '6px', fontWeight: 600 }}
-                    onClick={() => setFormData({ ...formData, quantity: availableStock.quantity.toString(), weight: availableStock.weight.toString() })}
-                    title="Use Quantity"
-                  >
-                    {availableStock.quantity} pcs
-                  </span>
-                </span>
-                <button 
-                  type="button" 
-                  className="btn btn-ghost" 
-                  style={{ height: '24px', fontSize: '11px', padding: '0 8px', borderRadius: '4px' }}
-                  onClick={() => setFormData({ ...formData, weight: availableStock.weight.toString(), quantity: availableStock.quantity.toString() })}
-                >
-                  இரண்டையும் போடு (Use Both)
-                </button>
-              </div>
-            )}
-
+            {/* Inputs: Weight & Qty */}
             <div className="form-group">
-              <label>விற்கப்படும் எடை (Weight g)</label>
-              <input type="number" step="0.001" value={formData.weight} onChange={e => setFormData({ ...formData, weight: e.target.value })} />
+              <label><Scale size={12} style={{ marginRight: '4px' }} />விற்கப்படும் எடை (Weight g)</label>
+              <input type="number" step="0.001" value={formData.weight} onChange={e => setFormData({ ...formData, weight: e.target.value })} placeholder="0.000" />
             </div>
             <div className="form-group">
               <label>விற்கப்படும் எண்ணிக்கை (Qty)</label>
-              <input type="number" value={formData.quantity} onChange={e => {
-                const q = parseInt(e.target.value || 0);
-                const w = availableStock ? (q * availableStock.weight) : 0;
-                setFormData({ ...formData, quantity: e.target.value, weight: w.toString() });
-              }} />
+              <input type="number" value={formData.quantity} onChange={e => setFormData({ ...formData, quantity: e.target.value })} placeholder="1" />
+            </div>
+
+            {/* Manual Entry: Amount & Discount */}
+            <div className="form-group">
+              <label><IndianRupee size={12} style={{ marginRight: '4px' }} />தொகை / மதிப்பு (Gross Amount ₹)</label>
+              <input
+                type="number" step="0.01" min="0" value={formData.grossAmount}
+                onChange={e => setFormData({ ...formData, grossAmount: e.target.value })}
+                placeholder="0.00"
+              />
+            </div>
+            <div className="form-group">
+              <label><Tag size={12} style={{ marginRight: '4px' }} />தள்ளுபடி (Discount Amount ₹)</label>
+              <input
+                type="number" step="0.01" min="0" value={formData.discountAmt}
+                onChange={e => setFormData({ ...formData, discountAmt: e.target.value })}
+                placeholder="0.00"
+              />
+            </div>
+
+            {/* Net Total Preview */}
+            <div className="grid-span-2" style={{
+              background: 'var(--bg)', padding: '10px 14px', borderRadius: '8px',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid var(--border)'
+            }}>
+              <span style={{ fontSize: '13px', color: 'var(--text-sub)', fontWeight: 600 }}>நிகர தொகை (Calculated Net Total):</span>
+              <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--success)', fontFamily: 'Inter' }}>
+                ₹{netVal.toLocaleString('en-IN')}
+              </span>
             </div>
           </div>
 
-          <button 
-            className="btn btn-gold btn-lg btn-full" 
+          <button
+            className="btn btn-full"
             onClick={addToCart}
             disabled={!selectedStockId}
-            style={{ marginTop: '14px' }}
+            style={{
+              marginTop: '16px', background: 'var(--primary)', color: 'var(--gold-light)',
+              height: '44px', fontSize: '14px', fontWeight: 700, borderRadius: '10px',
+              border: 'none', cursor: selectedStockId ? 'pointer' : 'not-allowed',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+            }}
           >
+            <PlusCircle size={16} />
             + பட்டியலில் சேர் (Add to Cart)
           </button>
         </div>
 
         {/* Cart & Customer */}
-        <div className="card">
-          <div className="card-title">விற்பனைப் பட்டியல் (Cart)</div>
-          
+        <div className="card" style={{ border: '1.5px solid rgba(90,160,109,0.25)' }}>
+          <div className="card-title">விற்பனைப் பட்டியல் (Cart &amp; Billing)</div>
+
           <div className="form-grid form-grid-cust mb-16">
             <div className="form-group">
               <label><User size={12} /> வாடிக்கையாளர் பெயர்</label>
@@ -403,16 +382,16 @@ const SellDashboard = ({ products = [], processSale }) => {
           </div>
 
           <div className="form-group mb-16">
-            <label>விற்பனை தேதி (Sale Date & Time) *</label>
-            <input 
-              type="datetime-local" 
-              value={saleDate} 
-              onChange={e => setSaleDate(e.target.value)} 
+            <label>விற்பனை தேதி (Sale Date &amp; Time) *</label>
+            <input
+              type="datetime-local"
+              value={saleDate}
+              onChange={e => setSaleDate(e.target.value)}
               required
             />
           </div>
 
-          <div style={{ minHeight: '200px', border: '1px solid var(--border)', borderRadius: 10, padding: '10px', background: 'rgba(0,0,0,0.01)', overflowY: 'auto', marginBottom: '15px' }}>
+          <div style={{ minHeight: '180px', border: '1px solid var(--border)', borderRadius: 10, padding: '10px', background: 'var(--bg)', overflowY: 'auto', marginBottom: '15px' }}>
             {cart.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-sub)' }}>பட்டியல் காலியாக உள்ளது</div>
             ) : (
@@ -420,7 +399,8 @@ const SellDashboard = ({ products = [], processSale }) => {
                 <thead>
                   <tr>
                     <th>Item</th>
-                    <th style={{ textAlign: 'right' }}>Qty | Wt</th>
+                    <th style={{ textAlign: 'center' }}>Qty | Wt</th>
+                    <th style={{ textAlign: 'right' }}>Amount</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -433,7 +413,15 @@ const SellDashboard = ({ products = [], processSale }) => {
                           {item.category} {item.detail && ` · ${item.detail}`}
                         </div>
                       </td>
-                      <td style={{ textAlign: 'right', fontWeight: 600 }}>{item.quantity} pcs | {item.weight}g</td>
+                      <td style={{ textAlign: 'center', fontWeight: 600 }}>{item.quantity} pcs | {item.weight}g</td>
+                      <td style={{ textAlign: 'right', fontWeight: 700, color: 'var(--success)' }}>
+                        ₹{item.total?.toLocaleString('en-IN')}
+                        {item.discountAmount > 0 && (
+                          <div style={{ fontSize: '10px', color: 'var(--danger)', fontWeight: 500 }}>
+                            (-₹{item.discountAmount})
+                          </div>
+                        )}
+                      </td>
                       <td style={{ textAlign: 'right' }}>
                         <button className="btn btn-danger-ghost" style={{ padding: 4 }} onClick={() => setCart(cart.filter((_, i) => i !== idx))}><Trash2 size={14} /></button>
                       </td>
@@ -445,17 +433,53 @@ const SellDashboard = ({ products = [], processSale }) => {
           </div>
 
           <div>
-            <div style={{ margin: '15px 0', padding: '15px', background: 'rgba(212,175,55,0.04)', borderRadius: '10px', border: '1px solid var(--border)', marginBottom: '16px' }}>
-              <div className="flex-between fw-600" style={{ fontSize: '14px' }}>
-                <span>மொத்த எண்ணிக்கை (Total Qty):</span><span>{cart.reduce((sum, item) => sum + (item.quantity || 0), 0)} pcs</span>
+            <div style={{ margin: '15px 0', padding: '14px', background: '#FFF', borderRadius: '10px', border: '1px solid var(--border)' }}>
+              <div className="flex-between fw-600" style={{ fontSize: '13.5px' }}>
+                <span>மொத்த எண்ணிக்கை:</span><span>{cart.reduce((sum, item) => sum + (item.quantity || 0), 0)} pcs</span>
               </div>
-              <div className="flex-between fw-600" style={{ fontSize: '14px', marginTop: '6px' }}>
-                <span>மொத்த எடை (Total Weight):</span><span>{cart.reduce((sum, item) => sum + (parseFloat(item.weight) || 0), 0).toFixed(3)} g</span>
+              <div className="flex-between fw-600" style={{ fontSize: '13.5px', marginTop: '4px' }}>
+                <span>மொத்த எடை:</span><span>{cart.reduce((sum, item) => sum + (parseFloat(item.weight) || 0), 0).toFixed(3)} g</span>
+              </div>
+              {cartDiscTotal > 0 && (
+                <div className="flex-between fw-600" style={{ fontSize: '13.5px', marginTop: '4px', color: 'var(--danger)' }}>
+                  <span>மொத்த தள்ளுபடி:</span><span>-₹{cartDiscTotal.toLocaleString('en-IN')}</span>
+                </div>
+              )}
+              <div className="flex-between fw-700" style={{ fontSize: '16px', marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed var(--border)', color: 'var(--primary)' }}>
+                <span>நிகர விற்பனை தொகை:</span><span>₹{cartNetTotal.toLocaleString('en-IN')}</span>
               </div>
             </div>
-            <button className="btn btn-primary btn-lg btn-full" disabled={!cart.length || loading} onClick={handleSale}>
-              <CreditCard size={18} /> {loading ? 'செயலாக்கப்படுகிறது...' : '💳 விற்பனை பற்றுச்சீட்டு (Log Sale)'}
-            </button>
+
+            {/* 2 Action Buttons: Log Sale Only VS Log & Print Bill */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <button
+                className="btn btn-full"
+                disabled={!cart.length || loading}
+                onClick={() => handleSale(false)}
+                style={{
+                  background: 'var(--soft-fern)', color: '#fff', height: '44px',
+                  borderRadius: '10px', fontSize: '13px', fontWeight: 700, border: 'none', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
+                }}
+              >
+                <CreditCard size={16} />
+                {loading ? 'செயலாக்கப்படுகிறது...' : 'பதிவு மட்டும் (Log Sale Only)'}
+              </button>
+
+              <button
+                className="btn btn-full"
+                disabled={!cart.length || loading}
+                onClick={() => handleSale(true)}
+                style={{
+                  background: 'var(--primary)', color: '#F0DFA8', height: '44px',
+                  borderRadius: '10px', fontSize: '13px', fontWeight: 700, border: 'none', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
+                }}
+              >
+                <Printer size={16} />
+                {loading ? 'செயலாக்கப்படுகிறது...' : '🖨️ பில் அச்சிடு (Log & Print)'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
