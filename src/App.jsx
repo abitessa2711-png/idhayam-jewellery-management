@@ -195,40 +195,58 @@ export default function App() {
 
   // ── Product CRUD (Stock Adding) ───────────────────────────────────────────
   const addProduct = async (newProduct) => {
-    // 1. Look up category ID (or insert it)
+    // 1. Look up category ID (or insert/fetch if not in state)
     let category = dbCategories.find(c => c.name === newProduct.category)
     if (!category) {
-      const { data, error } = await supabase.from('categories').insert({ name: newProduct.category }).select().single()
-      if (error) throw error
-      category = data
-      setDbCategories(prev => [...prev, category])
+      const { data: existingCat } = await supabase.from('categories').select('*').eq('name', newProduct.category).maybeSingle()
+      if (existingCat) {
+        category = existingCat
+        setDbCategories(prev => [...prev, category])
+      } else {
+        const { data, error } = await supabase.from('categories').insert({ name: newProduct.category }).select().single()
+        if (error) throw error
+        category = data
+        setDbCategories(prev => [...prev, category])
+      }
     }
 
-    // 2. Look up subcategory ID (or insert it)
+    // 2. Look up subcategory ID (or insert/fetch if not in state)
     let subcategory = null
     if (newProduct.subcategory) {
       subcategory = dbSubcategories.find(s => s.name === newProduct.subcategory && s.category_id === category.id)
       if (!subcategory) {
-        const { data, error } = await supabase.from('subcategories').insert({ category_id: category.id, name: newProduct.subcategory }).select().single()
-        if (error) throw error
-        subcategory = data
-        setDbSubcategories(prev => [...prev, subcategory])
+        const { data: existingSub } = await supabase.from('subcategories').select('*').eq('category_id', category.id).eq('name', newProduct.subcategory).maybeSingle()
+        if (existingSub) {
+          subcategory = existingSub
+          setDbSubcategories(prev => [...prev, subcategory])
+        } else {
+          const { data, error } = await supabase.from('subcategories').insert({ category_id: category.id, name: newProduct.subcategory }).select().single()
+          if (error) throw error
+          subcategory = data
+          setDbSubcategories(prev => [...prev, subcategory])
+        }
       }
     }
 
-    // 3. Look up variant ID (or insert it)
+    // 3. Look up variant ID (or insert/fetch if not in state)
     let variant = null
     if (newProduct.variant) {
       variant = dbVariants.find(v => v.name === newProduct.variant && v.category_id === category.id && v.subcategory_id === (subcategory?.id || null))
       if (!variant) {
-        const { data, error } = await supabase.from('variants').insert({
-          category_id: category.id,
-          subcategory_id: subcategory?.id || null,
-          name: newProduct.variant
-        }).select().single()
-        if (error) throw error
-        variant = data
-        setDbVariants(prev => [...prev, variant])
+        const { data: existingVar } = await supabase.from('variants').select('*').eq('category_id', category.id).eq('subcategory_id', subcategory?.id || null).eq('name', newProduct.variant).maybeSingle()
+        if (existingVar) {
+          variant = existingVar
+          setDbVariants(prev => [...prev, variant])
+        } else {
+          const { data, error } = await supabase.from('variants').insert({
+            category_id: category.id,
+            subcategory_id: subcategory?.id || null,
+            name: newProduct.variant
+          }).select().single()
+          if (error) throw error
+          variant = data
+          setDbVariants(prev => [...prev, variant])
+        }
       }
     }
 
