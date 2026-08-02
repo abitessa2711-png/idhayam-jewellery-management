@@ -4,8 +4,8 @@ import billLogo from './bill_logo.png'
 
 const BillModal = ({ bill, onClose }) => {
   if (!bill) return null
-  const [goldRate, setGoldRate] = useState('')
-  const [silverRate, setSilverRate] = useState('')
+  const [goldRate, setGoldRate] = useState(bill.goldRate || '')
+  const [silverRate, setSilverRate] = useState(bill.silverRate || '')
   const items = bill.items || []
 
   const totalQty = items.reduce((s, i) => s + (i.quantity || 0), 0)

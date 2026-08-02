@@ -24,6 +24,8 @@ const EMPTY_FORM = {
   serviceType: 'Polish (மெருகு)',
   amount:      '',
   notes:       '',
+  goldRate:    '',
+  silverRate:  '',
 }
 
 const fmtDate = (d) => {
@@ -377,6 +379,8 @@ const Reports = () => {
       serviceType: form.serviceType,
       amount:      parseFloat(form.amount),
       notes:       form.notes.trim(),
+      goldRate:    form.goldRate,
+      silverRate:  form.silverRate,
     }
     setRecords(prev => [rec, ...prev])
     setForm(EMPTY_FORM)
@@ -518,6 +522,24 @@ const Reports = () => {
                 type="text" name="notes" value={form.notes} onChange={handleChange}
                 placeholder="எ.கா. வாடிக்கையாளர் பெயர், கூடுதல் விவரம்..."
               />
+            </div>
+
+            {/* Today Rate Inputs */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>தங்கம் விலை (Gold 1g ₹)</label>
+                <input
+                  type="number" name="goldRate" value={form.goldRate} onChange={handleChange}
+                  placeholder="எ.கா. 7250"
+                />
+              </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>வெள்ளி விலை (Silver 1g ₹)</label>
+                <input
+                  type="number" name="silverRate" value={form.silverRate} onChange={handleChange}
+                  placeholder="எ.கா. 105"
+                />
+              </div>
             </div>
 
             {/* Submit */}
@@ -676,7 +698,7 @@ const Reports = () => {
                     <div style={{ display: 'flex', gap: '6px' }}>
                       {/* Print */}
                       <button
-                        onClick={() => printReceipt(r, goldRate, silverRate)}
+                        onClick={() => printReceipt(r, r.goldRate || goldRate, r.silverRate || silverRate)}
                         title="Print Receipt"
                         style={{
                           width: '32px', height: '32px', borderRadius: '8px', border: '1px solid var(--border)',

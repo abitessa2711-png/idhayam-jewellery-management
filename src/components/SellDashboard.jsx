@@ -10,6 +10,8 @@ const SellDashboard = ({ products = [], processSale }) => {
     category: '', subcategory: '', variant: '', detail: '', weight: '', quantity: '', grossAmount: '', discountAmt: ''
   })
   const [customer, setCustomer] = useState({ name: '', mobile: '' })
+  const [goldRate, setGoldRate] = useState('')
+  const [silverRate, setSilverRate] = useState('')
   const [cart, setCart] = useState([])
   const [loading, setLoading] = useState(false)
   const [showBill, setShowBill] = useState(null)
@@ -112,7 +114,7 @@ const SellDashboard = ({ products = [], processSale }) => {
     setLoading(true)
     try {
       const selectedIsoDate = new Date(saleDate).toISOString()
-      const bill = await processSale(customer.name || 'Walk-in', customer.mobile, cart, selectedIsoDate)
+      const bill = await processSale(customer.name || 'Walk-in', customer.mobile, cart, selectedIsoDate, goldRate, silverRate)
 
       setLastBill(bill)
       if (shouldPrint) {
@@ -123,6 +125,8 @@ const SellDashboard = ({ products = [], processSale }) => {
 
       setCart([])
       setCustomer({ name: '', mobile: '' })
+      setGoldRate('')
+      setSilverRate('')
       setSaleDate(new Date().toLocaleString('sv-SE').slice(0, 16).replace(' ', 'T'))
     } catch (err) {
       alert('விற்பனை பிழை: ' + err.message)
@@ -378,6 +382,17 @@ const SellDashboard = ({ products = [], processSale }) => {
             <div className="form-group">
               <label>மொபைல்</label>
               <input type="text" placeholder="Mobile" value={customer.mobile} onChange={e => setCustomer({ ...customer, mobile: e.target.value })} />
+            </div>
+          </div>
+
+          <div className="form-grid form-grid-2col mb-16">
+            <div className="form-group">
+              <label>இன்றைய தங்கம் விலை (Gold 1g ₹)</label>
+              <input type="number" placeholder="எ.கா. 7250" value={goldRate} onChange={e => setGoldRate(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label>இன்றைய வெள்ளி விலை (Silver 1g ₹)</label>
+              <input type="number" placeholder="எ.கா. 105" value={silverRate} onChange={e => setSilverRate(e.target.value)} />
             </div>
           </div>
 
