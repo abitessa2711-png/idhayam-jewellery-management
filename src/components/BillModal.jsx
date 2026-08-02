@@ -387,8 +387,7 @@ const BillModal = ({ bill, onClose }) => {
               <div style={{ fontSize: '11px', color: '#6A9A80', lineHeight: '1.6' }}>
                 <b>குறிப்பு / Terms:</b><br />
                 • 916 / 92.5 நகைகள் ஆர்டரின் பேரில் சிறந்த முறையில் செய்து தரப்படும்.<br />
-                • வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை.<br />
-                • சேதங்கள் ஏதும் இருப்பின் 2 நாட்களுக்குள் தெரிவிக்கவும்.
+                • வெள்ளி கொலுசுகளுக்கு செய்கூலி, சேதாரம் இல்லை.
               </div>
               <div style={{ marginTop: '12px' }}>
                 <span style={{ fontSize: '10px', color: '#6A9A80', display: 'block', fontWeight: 600 }}>ரூபாய் வார்த்தைகளில் / Amount in words:</span>
@@ -432,6 +431,23 @@ const BillModal = ({ bill, onClose }) => {
             <div className="signature-line">Customer Signature</div>
             <div className="signature-line">Cashier</div>
             <div className="signature-line">Salesman</div>
+          </div>
+
+          {/* Bordered English Discrepancy Notice */}
+          <div style={{
+            marginTop: '28px',
+            padding: '8px 12px',
+            border: '1.5px solid rgba(15, 61, 52, 0.25)',
+            borderRadius: '6px',
+            textAlign: 'center',
+            fontSize: '11px',
+            fontWeight: '700',
+            color: '#4A6B5D',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            fontFamily: "'Inter', sans-serif"
+          }}>
+            Please report any damages or discrepancies within 7 days.
           </div>
 
         </div>
