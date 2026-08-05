@@ -83,12 +83,18 @@ const SellDashboard = ({ products = [], processSale }) => {
     }
 
     if (availableStock) {
-      if (w > 0 && availableStock.weight < w) {
-        alert('போதுமான இருப்பு இல்லை')
+      const alreadyQty = cart.filter(item => item.productId === availableStock.id).reduce((s, i) => s + (parseInt(i.quantity) || 0), 0)
+      const alreadyWt = cart.filter(item => item.productId === availableStock.id).reduce((s, i) => s + (parseFloat(i.weight) || 0), 0)
+      
+      const availWt = Math.max(0, (availableStock.weight || 0) - alreadyWt)
+      const availQty = Math.max(0, (availableStock.quantity || 0) - alreadyQty)
+
+      if (w > 0 && w > (availWt + 0.0001)) {
+        alert(`இருப்பில் போதுமான எடை இல்லை! (இருப்பில் உள்ள எடை: ${availWt.toFixed(3)}g மட்டுமே)`)
         return
       }
-      if (q > 0 && availableStock.quantity < q) {
-        alert('போதுமான இருப்பு இல்லை')
+      if (q > 0 && q > availQty) {
+        alert(`இருப்பில் போதுமான எண்ணிக்கை இல்லை! (இருப்பில் உள்ள எண்ணிக்கை: ${availQty} pcs மட்டுமே)`)
         return
       }
     }
