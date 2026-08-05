@@ -261,12 +261,12 @@ const printReceipt = (r, goldRate = '', silverRate = '') => {
   <div class="customer-invoice-meta">
     <div>
       <span style="color: #6A9A80; fontSize: '11px'">வாடிக்கையாளர் விவரம் / Customer Info:</span>
-      <div style="font-size: 14px; font-weight: 700; color: #0F3D34; margin-top: 2px">\${r.customerName || 'Walk-in Customer'}</div>
-      \${r.customerPhone ? \`<div style="font-size: 11px; color: #333; margin-top: 2px; font-weight: 600">Ph: \${r.customerPhone}</div>\` : ''}
+      <div style="font-size: 14px; font-weight: 700; color: #0F3D34; margin-top: 2px">${r.customerName || 'Walk-in Customer'}</div>
+      ${r.customerPhone ? `<div style="font-size: 11px; color: #333; margin-top: 2px; font-weight: 600">Ph: ${r.customerPhone}</div>` : ''}
     </div>
     <div class="meta-col-right">
-      <div><b>பில் எண் / Receipt No:</b> SVC-\${r.id.toString().slice(-6)}</div>
-      <div><b>தேதி / Date:</b> \${fmtDate(r.date)}</div>
+      <div><b>பில் எண் / Receipt No:</b> SVC-${r.id.toString().slice(-6)}</div>
+      <div><b>தேதி / Date:</b> ${fmtDate(r.date)}</div>
     </div>
   </div>
 
