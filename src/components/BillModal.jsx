@@ -60,7 +60,7 @@ const BillModal = ({ bill, onClose }) => {
         .grt-invoice-container {
           background: #FFFFFF;
           color: #0F1A17;
-          width: 780px;
+          width: 840px;
           max-width: 95vw;
           max-height: 92vh;
           overflow-y: auto;
@@ -357,7 +357,7 @@ const BillModal = ({ bill, onClose }) => {
               <div style={{ flexShrink: 0 }}>
                 <img src={billLogo} alt="இதயம் ஜூவல்லரி" style={{ height: '85px', objectFit: 'contain' }} />
               </div>
-              <div style={{ fontSize: '11px', color: '#3D5C52', lineHeight: '1.5', textAlign: 'left' }}>
+              <div style={{ fontSize: '11px', color: '#3D5C52', lineHeight: '1.5', textAlign: 'left', maxWidth: '520px' }}>
                 <span style={{ fontWeight: 600, color: '#6A9A80' }}>GSTIN : 33AUIPL7759H1Z8</span><br />
                 <span style={{ fontWeight: 600 }}>📍 940/E, SKS வில்லா, ரத்தினவிலாஸ் பஸ்ஸ்டாப், Ujjivan Bank அருகில், சிவகாசி.</span><br />
                 <span style={{ fontWeight: 600 }}>📍 கிளை: 7, கீழரத வீதி, முருகன் கோயில் அருகில், சிவகாசி.</span><br />
@@ -366,7 +366,7 @@ const BillModal = ({ bill, onClose }) => {
             </div>
 
             {/* Today Rate Display Box inside printable sheet */}
-            {(goldRate || silverRate) && (
+            {(goldRate || silverRate || oldSilverAmount) && (
               <div style={{
                 display: 'flex',
                 justifyContent: 'center',
