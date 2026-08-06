@@ -12,6 +12,7 @@ const SellDashboard = ({ products = [], processSale }) => {
   const [customer, setCustomer] = useState({ name: '', mobile: '' })
   const [goldRate, setGoldRate] = useState('')
   const [silverRate, setSilverRate] = useState('')
+  const [oldSilverAmount, setOldSilverAmount] = useState('')
   const [cart, setCart] = useState([])
   const [loading, setLoading] = useState(false)
   const [showBill, setShowBill] = useState(null)
@@ -120,7 +121,7 @@ const SellDashboard = ({ products = [], processSale }) => {
     setLoading(true)
     try {
       const selectedIsoDate = new Date(saleDate).toISOString()
-      const bill = await processSale(customer.name || 'Walk-in', customer.mobile, cart, selectedIsoDate, goldRate, silverRate)
+      const bill = await processSale(customer.name || 'Walk-in', customer.mobile, cart, selectedIsoDate, goldRate, silverRate, oldSilverAmount)
 
       setLastBill(bill)
       if (shouldPrint) {
@@ -133,6 +134,7 @@ const SellDashboard = ({ products = [], processSale }) => {
       setCustomer({ name: '', mobile: '' })
       setGoldRate('')
       setSilverRate('')
+      setOldSilverAmount('')
       setSaleDate(new Date().toLocaleString('sv-SE').slice(0, 16).replace(' ', 'T'))
     } catch (err) {
       alert('விற்பனை பிழை: ' + err.message)
@@ -403,6 +405,11 @@ const SellDashboard = ({ products = [], processSale }) => {
           </div>
 
           <div className="form-group mb-16">
+            <label>பழைய வெள்ளி கழிப்பு (Old Silver Amount ₹)</label>
+            <input type="number" placeholder="எ.கா. 1500" value={oldSilverAmount} onChange={e => setOldSilverAmount(e.target.value)} />
+          </div>
+
+          <div className="form-group mb-16">
             <label>விற்பனை தேதி (Sale Date &amp; Time) *</label>
             <input
               type="datetime-local"
@@ -466,8 +473,13 @@ const SellDashboard = ({ products = [], processSale }) => {
                   <span>மொத்த தள்ளுபடி:</span><span>-₹{cartDiscTotal.toLocaleString('en-IN')}</span>
                 </div>
               )}
+              {(parseFloat(oldSilverAmount) || 0) > 0 && (
+                <div className="flex-between fw-600" style={{ fontSize: '13.5px', marginTop: '4px', color: 'var(--danger)' }}>
+                  <span>பழைய வெள்ளி கழிப்பு:</span><span>-₹{parseFloat(oldSilverAmount).toLocaleString('en-IN')}</span>
+                </div>
+              )}
               <div className="flex-between fw-700" style={{ fontSize: '16px', marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed var(--border)', color: 'var(--primary)' }}>
-                <span>நிகர விற்பனை தொகை:</span><span>₹{cartNetTotal.toLocaleString('en-IN')}</span>
+                <span>நிகர விற்பனை தொகை:</span><span>₹{Math.max(0, cartNetTotal - (parseFloat(oldSilverAmount) || 0)).toLocaleString('en-IN')}</span>
               </div>
             </div>
 
