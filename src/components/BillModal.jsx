@@ -271,70 +271,76 @@ const BillModal = ({ bill, onClose }) => {
       <div className="grt-invoice-container animate-fade-in" onClick={e => e.stopPropagation()}>
 
         {/* Top Control Bar (Hidden when printing) */}
+        {/* Top Control Bar (Hidden when printing) */}
         <div className="no-print" style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '12px 24px', background: '#0F3D34', borderBottom: '1px solid rgba(255,255,255,0.1)',
-          gap: '15px', flexWrap: 'wrap'
+          background: '#0F3D34', borderBottom: '1px solid rgba(255,255,255,0.1)',
+          padding: '12px 24px'
         }}>
-          <span style={{ color: '#F0DFA8', fontWeight: 600, fontSize: '13.5px' }}>
-            🧾 பில் அச்சு வடிவம் (Invoice Print Preview)
-          </span>
+          {/* Row 1: Title & Buttons */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', gap: '15px' }}>
+            <span style={{ color: '#F0DFA8', fontWeight: 600, fontSize: '14px' }}>
+              🧾 பில் அச்சு வடிவம் (Invoice Print Preview)
+            </span>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={handlePrint}
+                style={{
+                  background: 'linear-gradient(135deg, #C8A96A 0%, #A6834A 100%)',
+                  color: '#0F1A17', border: 'none', padding: '7px 18px', borderRadius: '8px',
+                  fontWeight: 700, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
+                }}
+              >
+                <Printer size={15} /> பில் அச்சிடு (Print Bill)
+              </button>
+              <button
+                onClick={onClose}
+                style={{
+                  background: 'rgba(255,255,255,0.15)', color: '#fff', border: 'none',
+                  width: '32px', height: '32px', borderRadius: '8px', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </div>
 
-          {/* Today Rate Inputs */}
-          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+          {/* Row 2: Today Rate Inputs */}
+          <div style={{
+            display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap',
+            background: 'rgba(0,0,0,0.15)', padding: '10px 16px', borderRadius: '8px',
+            border: '1px solid rgba(255,255,255,0.05)'
+          }}>
+            <div style={{ fontSize: '12px', color: '#C8A96A', fontWeight: 700 }}>இன்றைய விலை மாற்றங்கள் (Today's Rates):</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <label style={{ color: '#F0DFA8', fontSize: '12px', fontWeight: '600' }}>தங்கம் (Gold 1g):</label>
+              <label style={{ color: '#aaa', fontSize: '12px' }}>தங்கம் (Gold 1g):</label>
               <input
                 type="text"
                 placeholder="எ.கா. 7250"
                 value={goldRate}
                 onChange={e => setGoldRate(e.target.value)}
-                style={{ width: '85px', padding: '4px 8px', borderRadius: '6px', border: '1px solid #C8A96A', background: '#0B2923', color: '#FFFDF6', fontSize: '12px', fontWeight: '600' }}
+                style={{ width: '85px', padding: '4px 8px', borderRadius: '6px', border: '1px solid #C8A96A', background: '#0D1A17', color: '#FFFDF6', fontSize: '12px', fontWeight: '600' }}
               />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <label style={{ color: '#F0DFA8', fontSize: '12px', fontWeight: '600' }}>வெள்ளி (Silver 1g):</label>
+              <label style={{ color: '#aaa', fontSize: '12px' }}>வெள்ளி (Silver 1g):</label>
               <input
                 type="text"
                 placeholder="எ.கா. 105"
                 value={silverRate}
                 onChange={e => setSilverRate(e.target.value)}
-                style={{ width: '75px', padding: '4px 8px', borderRadius: '6px', border: '1px solid #C8A96A', background: '#0B2923', color: '#FFFDF6', fontSize: '12px', fontWeight: '600' }}
+                style={{ width: '75px', padding: '4px 8px', borderRadius: '6px', border: '1px solid #C8A96A', background: '#0D1A17', color: '#FFFDF6', fontSize: '12px', fontWeight: '600' }}
               />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <label style={{ color: '#F0DFA8', fontSize: '12px', fontWeight: '600' }}>பழைய வெள்ளி (Old Silver ₹):</label>
+              <label style={{ color: '#aaa', fontSize: '12px' }}>பழைய வெள்ளி (Old Silver ₹):</label>
               <input
                 type="text"
                 placeholder="எ.கா. 1500"
                 value={oldSilverAmount}
                 onChange={e => setOldSilverAmount(e.target.value)}
-                style={{ width: '85px', padding: '4px 8px', borderRadius: '6px', border: '1px solid #C8A96A', background: '#0B2923', color: '#FFFDF6', fontSize: '12px', fontWeight: '600' }}
+                style={{ width: '85px', padding: '4px 8px', borderRadius: '6px', border: '1px solid #C8A96A', background: '#0D1A17', color: '#FFFDF6', fontSize: '12px', fontWeight: '600' }}
               />
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              onClick={handlePrint}
-              style={{
-                background: 'linear-gradient(135deg, #C8A96A 0%, #A6834A 100%)',
-                color: '#0F1A17', border: 'none', padding: '7px 18px', borderRadius: '8px',
-                fontWeight: 700, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
-              }}
-            >
-              <Printer size={15} /> பில் அச்சிடு (Print Bill)
-            </button>
-            <button
-              onClick={onClose}
-              style={{
-                background: 'rgba(255,255,255,0.15)', color: '#fff', border: 'none',
-                width: '32px', height: '32px', borderRadius: '8px', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center'
-              }}
-            >
-              <X size={16} />
-            </button>
           </div>
         </div>
 
