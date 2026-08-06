@@ -7,7 +7,9 @@ const OldBuyback = ({ buybacks = [], onAddBuyback, onDeleteBuyback }) => {
     itemName: '',
     weight: '',
     amount: '',
-    detail: ''
+    detail: '',
+    customerName: '',
+    customerPhone: ''
   })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -27,14 +29,18 @@ const OldBuyback = ({ buybacks = [], onAddBuyback, onDeleteBuyback }) => {
         itemName: formData.itemName,
         weight: parseFloat(formData.weight),
         amount: parseFloat(formData.amount),
-        detail: formData.detail
+        detail: formData.detail,
+        customerName: formData.customerName,
+        customerPhone: formData.customerPhone
       })
       setFormData({
         date: new Date().toLocaleString('sv-SE').slice(0, 16).replace(' ', 'T'),
         itemName: '',
         weight: '',
         amount: '',
-        detail: ''
+        detail: '',
+        customerName: '',
+        customerPhone: ''
       })
       setSuccess(true)
       setTimeout(() => setSuccess(false), 3000)
@@ -75,6 +81,28 @@ const OldBuyback = ({ buybacks = [], onAddBuyback, onDeleteBuyback }) => {
           )}
 
           <form onSubmit={handleSubmit}>
+            {/* Customer Details */}
+            <div className="form-grid form-grid-2col" style={{ gap: 14, marginBottom: 14 }}>
+              <div className="form-group">
+                <label>வாடிக்கையாளர் பெயர் (Customer Name)</label>
+                <input 
+                  type="text" 
+                  placeholder="பெயர் (Name)"
+                  value={formData.customerName}
+                  onChange={e => setFormData({ ...formData, customerName: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label>மொபைல் எண் (Mobile Number)</label>
+                <input 
+                  type="text" 
+                  placeholder="மொபைல் (Mobile)"
+                  value={formData.customerPhone}
+                  onChange={e => setFormData({ ...formData, customerPhone: e.target.value })}
+                />
+              </div>
+            </div>
+
             <div className="form-group" style={{ marginBottom: 14 }}>
               <label>பொருளின் பெயர் (Item Name) *</label>
               <input 
@@ -171,7 +199,12 @@ const OldBuyback = ({ buybacks = [], onAddBuyback, onDeleteBuyback }) => {
                   <tr key={b.id} className="table-row">
                     <td>
                       <div className="fw-600">{b.itemName}</div>
-                      <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>
+                      {b.customerName && b.customerName !== 'Old Gold/Silver Buyback' && (
+                        <div style={{ fontSize: '11px', color: 'var(--gold)', fontWeight: 600, marginTop: '2px' }}>
+                          கஸ்டமர்: {b.customerName}
+                        </div>
+                      )}
+                      <div style={{ fontSize: 11, color: 'var(--text-sub)', marginTop: '2px' }}>
                         {new Date(b.date).toLocaleString('en-IN')}
                       </div>
                       {b.detail && (

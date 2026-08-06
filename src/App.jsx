@@ -134,11 +134,10 @@ export default function App() {
       setLedger(ledgerList)
     }
 
-    // 5. Fetch buybacks (Old gold/silver purchases)
     const { data: buybackList } = await supabase
       .from('purchases')
       .select('*')
-      .eq('supplier_name', 'Old Gold/Silver Buyback')
+      .eq('category', 'Old Item')
       .order('date', { ascending: false })
 
     if (buybackList) {
@@ -148,7 +147,8 @@ export default function App() {
         itemName: item.variant,
         weight: parseFloat(item.weight || 0),
         amount: parseFloat(item.amount || 0),
-        detail: item.detail || ''
+        detail: item.detail || '',
+        customerName: item.supplier_name
       })))
     }
   }
@@ -323,14 +323,14 @@ export default function App() {
 
   const addBuyback = async (buyback) => {
     const { error } = await supabase.from('purchases').insert({
-      supplier_name: 'Old Gold/Silver Buyback',
+      supplier_name: buyback.customerName || 'Old Gold/Silver Buyback',
       category: 'Old Item',
       variant: buyback.itemName,
       weight: buyback.weight,
       quantity: 1,
       rate: buyback.weight > 0 ? (buyback.amount / buyback.weight) : 0,
       amount: buyback.amount,
-      detail: buyback.detail || '',
+      detail: buyback.customerPhone ? `Ph: ${buyback.customerPhone} ${buyback.detail ? `· ${buyback.detail}` : ''}` : (buyback.detail || ''),
       date: buyback.date
     })
     if (error) throw error
