@@ -718,7 +718,15 @@ const Reports = () => {
                         {r.serviceType}
                       </span>
                     </div>
-                    <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+
+                    {(r.customerName || r.customerPhone) && (
+                      <div style={{ fontSize: '12px', color: '#B48A3C', fontWeight: 600, marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        {r.customerName && <span>👤 {r.customerName}</span>}
+                        {r.customerPhone && <span>📞 {r.customerPhone}</span>}
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
                       <span style={{ fontSize: '12px', color: 'var(--text-sub)', fontFamily: 'Inter', display: 'flex', alignItems: 'center', gap: '4px' }}>
                         <CalendarDays size={11} /> {fmtDate(r.date)}
                       </span>
