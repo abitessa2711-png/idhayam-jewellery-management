@@ -499,14 +499,6 @@ const BillModal = ({ bill, onClose }) => {
                   <span>-₹{parseFloat(oldSilverAmount).toLocaleString('en-IN')}</span>
                 </div>
               )}
-              <div className="totals-row">
-                <span style={{ color: '#6A9A80' }}>மொத்த எடை (Total Weight):</span>
-                <span style={{ fontWeight: 600 }}>{totalWeight.toFixed(3)} g</span>
-              </div>
-              <div className="totals-row">
-                <span style={{ color: '#6A9A80' }}>மொத்த எண்ணிக்கை (Total Qty):</span>
-                <span style={{ fontWeight: 600 }}>{totalQty} pcs</span>
-              </div>
               <div className="totals-row grand-total">
                 <span>மொத்த பில் தொகை (Grand Total):</span>
                 <span>₹{finalBillAmount.toLocaleString('en-IN')}</span>
