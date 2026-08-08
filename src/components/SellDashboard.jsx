@@ -13,6 +13,7 @@ const SellDashboard = ({ products = [], processSale }) => {
   const [goldRate, setGoldRate] = useState('')
   const [silverRate, setSilverRate] = useState('')
   const [oldSilverAmount, setOldSilverAmount] = useState('')
+  const [oldGoldAmount, setOldGoldAmount] = useState('')
   const [cart, setCart] = useState([])
   const [loading, setLoading] = useState(false)
   const [showBill, setShowBill] = useState(null)
@@ -121,7 +122,7 @@ const SellDashboard = ({ products = [], processSale }) => {
     setLoading(true)
     try {
       const selectedIsoDate = new Date(saleDate).toISOString()
-      const bill = await processSale(customer.name || 'Walk-in', customer.mobile, cart, selectedIsoDate, goldRate, silverRate, oldSilverAmount)
+      const bill = await processSale(customer.name || 'Walk-in', customer.mobile, cart, selectedIsoDate, goldRate, silverRate, oldSilverAmount, oldGoldAmount)
 
       setLastBill(bill)
       if (shouldPrint) {
@@ -135,6 +136,7 @@ const SellDashboard = ({ products = [], processSale }) => {
       setGoldRate('')
       setSilverRate('')
       setOldSilverAmount('')
+      setOldGoldAmount('')
       setSaleDate(new Date().toLocaleString('sv-SE').slice(0, 16).replace(' ', 'T'))
     } catch (err) {
       alert('விற்பனை பிழை: ' + err.message)
@@ -404,9 +406,15 @@ const SellDashboard = ({ products = [], processSale }) => {
             </div>
           </div>
 
-          <div className="form-group mb-16">
-            <label>பழைய வெள்ளி கழிப்பு (Old Silver Amount ₹)</label>
-            <input type="number" placeholder="எ.கா. 1500" value={oldSilverAmount} onChange={e => setOldSilverAmount(e.target.value)} />
+          <div className="form-grid form-grid-2col mb-16">
+            <div className="form-group">
+              <label>பழைய தங்கம் கழிப்பு (Old Gold Amount ₹)</label>
+              <input type="number" placeholder="எ.கா. 2000" value={oldGoldAmount} onChange={e => setOldGoldAmount(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label>பழைய வெள்ளி கழிப்பு (Old Silver Amount ₹)</label>
+              <input type="number" placeholder="எ.கா. 1500" value={oldSilverAmount} onChange={e => setOldSilverAmount(e.target.value)} />
+            </div>
           </div>
 
           <div className="form-group mb-16">

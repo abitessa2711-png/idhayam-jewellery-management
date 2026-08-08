@@ -7,6 +7,7 @@ const BillModal = ({ bill, onClose }) => {
   const [goldRate, setGoldRate] = useState(bill.goldRate || '')
   const [silverRate, setSilverRate] = useState(bill.silverRate || '')
   const [oldSilverAmount, setOldSilverAmount] = useState(bill.oldSilverAmount || '')
+  const [oldGoldAmount, setOldGoldAmount] = useState(bill.oldGoldAmount || '')
   const items = bill.items || []
 
   const totalQty = items.reduce((s, i) => s + (i.quantity || 0), 0)
@@ -14,7 +15,7 @@ const BillModal = ({ bill, onClose }) => {
   const totalGross = items.reduce((s, i) => s + (parseFloat(i.grossAmount || i.subtotal || i.total) || 0), 0)
   const totalDiscount = items.reduce((s, i) => s + (parseFloat(i.discountAmount) || 0), 0)
   const netTotal = items.reduce((s, i) => s + (parseFloat(i.total) || 0), 0)
-  const finalBillAmount = Math.max(0, netTotal - (parseFloat(oldSilverAmount) || 0))
+  const finalBillAmount = Math.max(0, netTotal - (parseFloat(oldGoldAmount) || 0) - (parseFloat(oldSilverAmount) || 0))
 
   const handlePrint = () => {
     window.print()
@@ -333,6 +334,16 @@ const BillModal = ({ bill, onClose }) => {
               />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <label style={{ color: '#aaa', fontSize: '12px' }}>பழைய தங்கம் (Old Gold ₹):</label>
+              <input
+                type="text"
+                placeholder="எ.கா. 2000"
+                value={oldGoldAmount}
+                onChange={e => setOldGoldAmount(e.target.value)}
+                style={{ width: '85px', padding: '4px 8px', borderRadius: '6px', border: '1px solid #C8A96A', background: '#0D1A17', color: '#FFFDF6', fontSize: '12px', fontWeight: '600' }}
+              />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <label style={{ color: '#aaa', fontSize: '12px' }}>பழைய வெள்ளி (Old Silver ₹):</label>
               <input
                 type="text"
@@ -341,6 +352,7 @@ const BillModal = ({ bill, onClose }) => {
                 onChange={e => setOldSilverAmount(e.target.value)}
                 style={{ width: '85px', padding: '4px 8px', borderRadius: '6px', border: '1px solid #C8A96A', background: '#0D1A17', color: '#FFFDF6', fontSize: '12px', fontWeight: '600' }}
               />
+            </div>
           </div>
         </div>
 
@@ -366,7 +378,7 @@ const BillModal = ({ bill, onClose }) => {
             </div>
 
             {/* Today Rate Display Box inside printable sheet */}
-            {(goldRate || silverRate || oldSilverAmount) && (
+            {(goldRate || silverRate || oldGoldAmount || oldSilverAmount) && (
               <div style={{
                 display: 'flex',
                 justifyContent: 'center',
@@ -383,6 +395,7 @@ const BillModal = ({ bill, onClose }) => {
               }}>
                 {goldRate && <span>Today Gold Rate (1g): ₹{Number(goldRate).toLocaleString('en-IN')}</span>}
                 {silverRate && <span>Today Silver Rate (1g): ₹{Number(silverRate).toLocaleString('en-IN')}</span>}
+                {oldGoldAmount && <span>Old Gold Value: ₹{Number(oldGoldAmount).toLocaleString('en-IN')}</span>}
                 {oldSilverAmount && <span>Old Silver Value: ₹{Number(oldSilverAmount).toLocaleString('en-IN')}</span>}
               </div>
             )}
@@ -474,6 +487,18 @@ const BillModal = ({ bill, onClose }) => {
                   <span>-₹{totalDiscount.toLocaleString('en-IN')}</span>
                 </div>
               )}
+              {(parseFloat(oldGoldAmount) || 0) > 0 && (
+                <div className="totals-row" style={{ color: '#C0392B', fontWeight: 600 }}>
+                  <span>பழைய தங்கம் கழிப்பு (Less Old Gold):</span>
+                  <span>-₹{parseFloat(oldGoldAmount).toLocaleString('en-IN')}</span>
+                </div>
+              )}
+              {(parseFloat(oldSilverAmount) || 0) > 0 && (
+                <div className="totals-row" style={{ color: '#C0392B', fontWeight: 600 }}>
+                  <span>பழைய வெள்ளி கழிப்பு (Less Old Silver):</span>
+                  <span>-₹{parseFloat(oldSilverAmount).toLocaleString('en-IN')}</span>
+                </div>
+              )}
               <div className="totals-row">
                 <span style={{ color: '#6A9A80' }}>மொத்த எடை (Total Weight):</span>
                 <span style={{ fontWeight: 600 }}>{totalWeight.toFixed(3)} g</span>
@@ -482,12 +507,6 @@ const BillModal = ({ bill, onClose }) => {
                 <span style={{ color: '#6A9A80' }}>மொத்த எண்ணிக்கை (Total Qty):</span>
                 <span style={{ fontWeight: 600 }}>{totalQty} pcs</span>
               </div>
-              {(parseFloat(oldSilverAmount) || 0) > 0 && (
-                <div className="totals-row" style={{ color: '#C0392B', fontWeight: 600 }}>
-                  <span>பழைய வெள்ளி கழிப்பு (Less Old Silver):</span>
-                  <span>-₹{parseFloat(oldSilverAmount).toLocaleString('en-IN')}</span>
-                </div>
-              )}
               <div className="totals-row grand-total">
                 <span>மொத்த பில் தொகை (Grand Total):</span>
                 <span>₹{finalBillAmount.toLocaleString('en-IN')}</span>

@@ -342,7 +342,7 @@ export default function App() {
   }
 
   // ── Sales (Process sale, deduct stock, log history) ───────────────────────
-  const processSale = async (customerName, mobile, cartItems, customDate, goldRate = '', silverRate = '') => {
+  const processSale = async (customerName, mobile, cartItems, customDate, goldRate = '', silverRate = '', oldSilverAmount = '', oldGoldAmount = '') => {
     const billId = `IDH-${Date.now()}`
     const date = customDate || new Date().toISOString()
 
@@ -422,7 +422,7 @@ export default function App() {
       if (saleHistoryErr) throw saleHistoryErr
     }
 
-    return { id: billId, customerName, mobile, items: cartItems, date, goldRate, silverRate }
+    return { id: billId, customerName, mobile, items: cartItems, date, goldRate, silverRate, oldSilverAmount, oldGoldAmount }
   }
 
   // ── Auth gates ─────────────────────────────────────────────────────────────
