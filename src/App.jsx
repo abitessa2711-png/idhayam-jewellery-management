@@ -425,6 +425,16 @@ export default function App() {
     return { id: billId, customerName, mobile, items: cartItems, date, goldRate, silverRate, oldSilverAmount, oldGoldAmount }
   }
 
+  const deleteSale = async (id) => {
+    const { error } = await supabase.from('sales').delete().eq('id', id)
+    if (error) {
+      console.error("Error deleting sale:", error)
+      alert("விற்பனைப் பதிவை நீக்குவதில் பிழை: " + error.message)
+    } else {
+      setSoldItems(prev => prev.filter(item => item.id !== id))
+    }
+  }
+
   // ── Auth gates ─────────────────────────────────────────────────────────────
   if (!user) {
     if (showSignup) return <Signup onBack={() => setShowSignup(false)} onSignupSuccess={() => setShowSignup(false)} />
@@ -437,7 +447,7 @@ export default function App() {
     stock:     <StockDashboard products={products}   onDelete={deleteProduct} role={user?.role} />,
     add:       <AddStock       onAddProduct={addProduct} />,
     sell:      <SellDashboard  products={products}   processSale={processSale} />,
-    sold:        <SoldItems      soldItems={soldItems} />,
+    sold:        <SoldItems      soldItems={soldItems} onDeleteSale={deleteSale} />,
     old_buyback: <OldBuyback     buybacks={buybacks}   onAddBuyback={addBuyback} onDeleteBuyback={deleteBuyback} />,
     reports:     <Reports        products={products}   soldItems={soldItems} role={user?.role} deleteProduct={deleteProduct} />
   }
