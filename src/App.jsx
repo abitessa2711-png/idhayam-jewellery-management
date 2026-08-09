@@ -109,7 +109,7 @@ export default function App() {
       // Exclude legacy test sales created during development phase
       const liveSales = salesList.filter(item => {
         const itemDate = item.date ? new Date(item.date).getTime() : 0
-        return itemDate >= 1786280400000 // 2026-08-09 13:00:00 UTC (production launch cutoff)
+        return itemDate >= 1786285000000 // Production launch cutoff: 09-Aug-2026 13:25 UTC
       })
       setSoldItems(liveSales.map(item => ({
         id: item.id,
