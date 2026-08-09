@@ -358,15 +358,24 @@ export default function App() {
         throw new Error(`பொருள் இருப்பில் இல்லை (Item not found in stock)`)
       }
 
-      if (parseInt(stock.quantity || 0) < item.quantity) {
-        throw new Error(`போதுமான எண்ணிக்கை இல்லை (Insufficient quantity)`)
+      const isKodi = (stock.category === 'கொடி' || item.category === 'கொடி')
+      let newQty = 0
+      let newWeight = 0
+
+      if (isKodi) {
+        if (parseFloat(stock.weight || 0) < (parseFloat(item.weight) || 0) - 0.0001) {
+          throw new Error(`போதுமான எடை இல்லை (Insufficient weight in Kodi Roll)`)
+        }
+        newWeight = Math.max(0, parseFloat(stock.weight || 0) - (parseFloat(item.weight) || 0))
+        newQty = newWeight > 0.0001 ? 1 : 0
+      } else {
+        if (parseInt(stock.quantity || 0) < item.quantity) {
+          throw new Error(`போதுமான எண்ணிக்கை இல்லை (Insufficient quantity)`)
+        }
+        newQty = Math.max(0, parseInt(stock.quantity || 0) - (item.quantity || 0))
+        newWeight = newQty > 0 ? Math.max(0, parseFloat(stock.weight || 0) - (parseFloat(item.weight) || 0)) : 0
       }
 
-      // 2. Deduct stock quantity
-      const newQty = Math.max(0, parseInt(stock.quantity || 0) - (item.quantity || 0))
-      // Weight remains stock.weight, but we can set it to 0 if quantity is 0
-      const newWeight = newQty > 0 ? parseFloat(stock.weight) : 0
-      
       const { error: updateErr } = await supabase
         .from('stock_entries')
         .update({ weight: newWeight, quantity: newQty })
@@ -421,6 +430,8 @@ export default function App() {
         })
       if (saleHistoryErr) throw saleHistoryErr
     }
+
+    await loadData()
 
     return { id: billId, customerName, mobile, items: cartItems, date, goldRate, silverRate, oldSilverAmount, oldGoldAmount }
   }
