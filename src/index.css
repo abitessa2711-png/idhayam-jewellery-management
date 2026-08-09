@@ -1124,4 +1124,30 @@ tbody tr:last-child td {
     grid-column: span 1 !important;
     width: 100% !important;
   }
+
+  .service-log-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 16px !important;
+  }
+
+  .service-log-grid > div {
+    position: static !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+/* Service Log Desktop Layout */
+.service-log-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (min-width: 901px) {
+  .sticky-card-desktop {
+    position: sticky;
+    top: 90px;
+  }
 }

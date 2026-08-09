@@ -408,7 +408,7 @@ const Reports = () => {
     <div className="animate-fade-in">
 
       {/* ── Page Header ──────────────────────────────────── */}
-      <div className="flex-between mb-16">
+      <div className="flex-between mb-16" style={{ flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <h2 style={{ fontSize: '24px', fontWeight: 700, fontFamily: "'Noto Sans Tamil', sans-serif", color: 'var(--primary)' }}>
             சேவை பதிவேடு
@@ -418,7 +418,7 @@ const Reports = () => {
           </p>
         </div>
         {/* Summary pills */}
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
           {records.length > 0 && (
             <button
               onClick={() => {
@@ -457,10 +457,10 @@ const Reports = () => {
       )}
 
       {/* ── 2-Column Layout ──────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: '24px', alignItems: 'start' }}>
+      <div className="service-log-grid">
 
         {/* ══ LEFT: Entry Form ═════════════════════════════ */}
-        <div className="card" style={{ position: 'sticky', top: '90px', border: '1.5px solid rgba(90,160,109,0.25)' }}>
+        <div className="card sticky-card-desktop" style={{ border: '1.5px solid rgba(90,160,109,0.25)' }}>
 
           {/* Gold shimmer line */}
           <div style={{
