@@ -106,7 +106,12 @@ export default function App() {
       .order('date', { ascending: true })
 
     if (salesList) {
-      setSoldItems(salesList.map(item => ({
+      // Exclude legacy test sales created during development phase
+      const liveSales = salesList.filter(item => {
+        const itemDate = item.date ? new Date(item.date).getTime() : 0
+        return itemDate >= 1786280400000 // 2026-08-09 13:00:00 UTC (production launch cutoff)
+      })
+      setSoldItems(liveSales.map(item => ({
         id: item.id,
         billId: item.bill_id,
         customerName: item.customer_name,
