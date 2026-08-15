@@ -52,16 +52,6 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
             Live Stock · {filteredProducts.length} பதிவுகள் · மொத்த எண்ணிக்கை {totalQuantity} pcs · மொத்த எடை {totalWeight.toFixed(3)}g
           </p>
         </div>
-        {role === 'admin' && onClearAllStock && (
-          <button
-            className="btn"
-            style={{ background: 'rgba(239,68,68,0.12)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600 }}
-            onClick={onClearAllStock}
-            title="அனைத்து பழைய இருப்பு தரவுகளையும் நீக்கு"
-          >
-            <Trash2 size={16} /> அனைத்து இருப்பையும் நீக்கு (Clear All Stock)
-          </button>
-        )}
       </div>
 
       {/* Search and Filter Card */}
