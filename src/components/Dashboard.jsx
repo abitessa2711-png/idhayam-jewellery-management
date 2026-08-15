@@ -2,20 +2,25 @@ import React from 'react'
 import { Package, ShoppingBag, AlertTriangle, TrendingUp, PlusCircle } from 'lucide-react'
 
 const Dashboard = ({ products = [], sales = [], setActiveTab }) => {
+  // Only consider active products with positive weight (>0) and positive quantity (>0)
+  const validProducts = products.filter(p => (parseFloat(p.weight) || 0) > 0 && (parseInt(p.quantity) || 0) > 0)
+
   // Aggregate Stats
-  const totalWeight = products.reduce((s, p) => s + ((p.quantity || 0) * (p.weight || 0)), 0)
-  const totalQty    = products.reduce((s, p) => s + (p.quantity || 0), 0)
+  const totalWeight = validProducts.reduce((s, p) => s + ((p.quantity || 0) * (parseFloat(p.weight) || 0)), 0)
+  const totalQty    = validProducts.reduce((s, p) => s + (p.quantity || 0), 0)
+  
   const productGroups = {};
-  products.forEach(p => {
+  validProducts.forEach(p => {
     const key = `${p.category}-${p.subcategory}-${p.variant}`;
     if (!productGroups[key]) {
       productGroups[key] = { ...p, totalQuantity: 0, totalWeight: 0 };
     }
     productGroups[key].totalQuantity += (p.quantity || 0);
-    productGroups[key].totalWeight += ((p.quantity || 0) * (p.weight || 0));
+    productGroups[key].totalWeight += ((p.quantity || 0) * (parseFloat(p.weight) || 0));
   });
   
-  const lowStock = Object.values(productGroups).filter(g => g.totalQuantity < 3);
+  // Low stock warning: Only for items that are active in stock but low in quantity (0 < totalQuantity < 3)
+  const lowStock = Object.values(productGroups).filter(g => g.totalQuantity > 0 && g.totalQuantity < 3);
   
   const todayStr = new Date().toISOString().split('T')[0]
   const todaysSales = sales.filter(s => (s.date && s.date.split('T')[0]) === todayStr)
@@ -61,7 +66,7 @@ const Dashboard = ({ products = [], sales = [], setActiveTab }) => {
                 <tr><th>Item</th><th className="hide-mobile">Category</th><th style={{ textAlign: 'right' }}>Stock Qty | Wt</th></tr>
               </thead>
               <tbody>
-                {products.slice(-5).reverse().map(p => (
+                {validProducts.slice(-5).reverse().map(p => (
                   <tr key={p.id}>
                     <td>
                       <div className="fw-600">{p.variant}</div>
@@ -74,7 +79,7 @@ const Dashboard = ({ products = [], sales = [], setActiveTab }) => {
                     <td style={{ textAlign: 'right' }}><span className="text-gold fw-600">{p.quantity} pcs | {p.weight}g</span></td>
                   </tr>
                 ))}
-                {products.length === 0 && <tr><td colSpan="3" style={{ textAlign: 'center', padding: 20 }}>தகவல் இல்லை</td></tr>}
+                {validProducts.length === 0 && <tr><td colSpan="3" style={{ textAlign: 'center', padding: 20 }}>தகவல் இல்லை (இருப்பு காலியாக உள்ளது)</td></tr>}
               </tbody>
             </table>
           </div>
@@ -90,8 +95,8 @@ const Dashboard = ({ products = [], sales = [], setActiveTab }) => {
               lowStock.map((p, idx) => (
                 <div key={idx} className="flex-between" style={{ padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
                   <div>
-                    <div className="fw-600" style={{ fontSize: 14 }}>{p.variant}</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>{p.category} - {p.subcategory}</div>
+                    <div className="fw-600" style={{ fontSize: 14 }}>{p.variant} {p.detail ? `(${p.detail})` : ''}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-sub)' }}>{p.category} · {p.subcategory}</div>
                   </div>
                   <div className="text-danger fw-700">{p.totalQuantity} pcs | {p.totalWeight.toFixed(2)}g</div>
                 </div>

@@ -106,12 +106,7 @@ export default function App() {
       .order('date', { ascending: true })
 
     if (salesList) {
-      // Exclude legacy test sales created during development phase
-      const liveSales = salesList.filter(item => {
-        const itemDate = item.date ? new Date(item.date).getTime() : 0
-        return itemDate >= 1786285000000 // Production launch cutoff: 09-Aug-2026 13:25 UTC
-      })
-      setSoldItems(liveSales.map(item => ({
+      setSoldItems(salesList.map(item => ({
         id: item.id,
         billId: item.bill_id,
         customerName: item.customer_name,
@@ -158,7 +153,7 @@ export default function App() {
     }
   }
 
-  // ── Realtime Postgres Subscriptions ───────────────────────────────────────
+  // ── Realtime Postgres Subscriptions & Mobile Sync ───────────────────────────
   useEffect(() => {
     if (!user) return
 
@@ -172,8 +167,18 @@ export default function App() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'purchases' }, () => { loadData() })
       .subscribe()
 
+    // Auto-sync when switching back to tab/browser on mobile
+    const handleFocus = () => { loadData() }
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') loadData()
+    }
+    window.addEventListener('focus', handleFocus)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
     return () => {
       supabase.removeChannel(channel)
+      window.removeEventListener('focus', handleFocus)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [user])
 
@@ -314,6 +319,18 @@ export default function App() {
   const deleteProduct = async (id) => {
     const { error } = await supabase.from('stock_entries').delete().eq('id', id)
     if (error) console.error("Error deleting product:", error)
+  }
+
+  const clearAllStockData = async () => {
+    if (window.confirm('அனைத்து பழைய/டெமோ இருப்புத் தரவுகளையும் நீக்க வேண்டுமா? (Are you sure you want to clear all stock data?)')) {
+      const { error } = await supabase.from('stock_entries').delete().gt('id', 0)
+      if (!error) {
+        alert('அனைத்து இருப்புத் தரவுகளும் வெற்றிகரமாக நீக்கப்பட்டன! (All stock entries cleared successfully)')
+        loadData()
+      } else {
+        alert('பிழை: ' + error.message)
+      }
+    }
   }
 
   const updateProduct = async (id, updates) => {
@@ -460,7 +477,7 @@ export default function App() {
   // ── Pages ──────────────────────────────────────────────────────────────────
   const pages = {
     dashboard: <Dashboard      products={products}   sales={soldItems}  setActiveTab={setActiveTab} />,
-    stock:     <StockDashboard products={products}   onDelete={deleteProduct} role={user?.role} />,
+    stock:     <StockDashboard products={products}   onDelete={deleteProduct} onClearAllStock={clearAllStockData} role={user?.role} />,
     add:       <AddStock       onAddProduct={addProduct} />,
     sell:      <SellDashboard  products={products}   processSale={processSale} />,
     sold:        <SoldItems      soldItems={soldItems} onDeleteSale={deleteSale} />,
@@ -484,6 +501,7 @@ export default function App() {
           username={user?.name || 'User'}
           onLogout={handleLogout}
           onMenuClick={() => setIsSidebarOpen(true)}
+          onRefresh={loadData}
         />
         <main className="container animate-fade-in">
           {currentPage}

@@ -116,42 +116,61 @@ CREATE TABLE returns (
 );
 
 -- Enable Row Level Security (RLS)
-ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE subcategories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE variants ENABLE ROW LEVEL SECURITY;
-ALTER TABLE stock_entries ENABLE ROW LEVEL SECURITY;
-ALTER TABLE sales_entries ENABLE ROW LEVEL SECURITY;
-ALTER TABLE ledger ENABLE ROW LEVEL SECURITY;
-ALTER TABLE purchases ENABLE ROW LEVEL SECURITY;
-ALTER TABLE sales ENABLE ROW LEVEL SECURITY;
-ALTER TABLE returns ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.subcategories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.variants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.stock_entries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.sales_entries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ledger ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.purchases ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.sales ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.returns ENABLE ROW LEVEL SECURITY;
 
 -- Create policies (Allow full public access for testing and bypass account compatibility)
-CREATE POLICY "Allow select categories" ON categories FOR SELECT USING (true);
-CREATE POLICY "Allow insert categories" ON categories FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow select categories" ON public.categories FOR SELECT USING (true);
+CREATE POLICY "Allow insert categories" ON public.categories FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow update categories" ON public.categories FOR UPDATE USING (true);
+CREATE POLICY "Allow delete categories" ON public.categories FOR DELETE USING (true);
 
-CREATE POLICY "Allow select subcategories" ON subcategories FOR SELECT USING (true);
-CREATE POLICY "Allow insert subcategories" ON subcategories FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow select subcategories" ON public.subcategories FOR SELECT USING (true);
+CREATE POLICY "Allow insert subcategories" ON public.subcategories FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow update subcategories" ON public.subcategories FOR UPDATE USING (true);
+CREATE POLICY "Allow delete subcategories" ON public.subcategories FOR DELETE USING (true);
 
-CREATE POLICY "Allow select variants" ON variants FOR SELECT USING (true);
-CREATE POLICY "Allow insert variants" ON variants FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow select variants" ON public.variants FOR SELECT USING (true);
+CREATE POLICY "Allow insert variants" ON public.variants FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow update variants" ON public.variants FOR UPDATE USING (true);
+CREATE POLICY "Allow delete variants" ON public.variants FOR DELETE USING (true);
 
-CREATE POLICY "Allow select stock" ON stock_entries FOR SELECT USING (true);
-CREATE POLICY "Allow insert stock" ON stock_entries FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow update stock" ON stock_entries FOR UPDATE USING (true);
-CREATE POLICY "Allow delete stock" ON stock_entries FOR DELETE USING (true);
+CREATE POLICY "Allow select stock" ON public.stock_entries FOR SELECT USING (true);
+CREATE POLICY "Allow insert stock" ON public.stock_entries FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow update stock" ON public.stock_entries FOR UPDATE USING (true);
+CREATE POLICY "Allow delete stock" ON public.stock_entries FOR DELETE USING (true);
 
-CREATE POLICY "Allow select sales_entries" ON sales_entries FOR SELECT USING (true);
-CREATE POLICY "Allow insert sales_entries" ON sales_entries FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow select sales_entries" ON public.sales_entries FOR SELECT USING (true);
+CREATE POLICY "Allow insert sales_entries" ON public.sales_entries FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow update sales_entries" ON public.sales_entries FOR UPDATE USING (true);
+CREATE POLICY "Allow delete sales_entries" ON public.sales_entries FOR DELETE USING (true);
 
-CREATE POLICY "Allow select ledger" ON ledger FOR SELECT USING (true);
-CREATE POLICY "Allow insert ledger" ON ledger FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow select ledger" ON public.ledger FOR SELECT USING (true);
+CREATE POLICY "Allow insert ledger" ON public.ledger FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow update ledger" ON public.ledger FOR UPDATE USING (true);
+CREATE POLICY "Allow delete ledger" ON public.ledger FOR DELETE USING (true);
 
-CREATE POLICY "Allow select sales" ON sales FOR SELECT USING (true);
-CREATE POLICY "Allow insert sales" ON sales FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow select purchases" ON public.purchases FOR SELECT USING (true);
+CREATE POLICY "Allow insert purchases" ON public.purchases FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow update purchases" ON public.purchases FOR UPDATE USING (true);
+CREATE POLICY "Allow delete purchases" ON public.purchases FOR DELETE USING (true);
 
-CREATE POLICY "Allow select returns" ON returns FOR SELECT USING (true);
-CREATE POLICY "Allow insert returns" ON returns FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow select sales" ON public.sales FOR SELECT USING (true);
+CREATE POLICY "Allow insert sales" ON public.sales FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow update sales" ON public.sales FOR UPDATE USING (true);
+CREATE POLICY "Allow delete sales" ON public.sales FOR DELETE USING (true);
+
+CREATE POLICY "Allow select returns" ON public.returns FOR SELECT USING (true);
+CREATE POLICY "Allow insert returns" ON public.returns FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow update returns" ON public.returns FOR UPDATE USING (true);
+CREATE POLICY "Allow delete returns" ON public.returns FOR DELETE USING (true);
 
 -- Enable Realtime for crucial tables
 ALTER PUBLICATION supabase_realtime ADD TABLE stock_entries;

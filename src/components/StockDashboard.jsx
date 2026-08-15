@@ -1,18 +1,32 @@
 import React, { useState } from 'react'
 import { Trash2, Search, Filter } from 'lucide-react'
 
-const StockDashboard = ({ products = [], onDelete, role = 'admin' }) => {
+const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admin' }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
+  const [selectedSubcategory, setSelectedSubcategory] = useState('')
+  const [selectedDetail, setSelectedDetail] = useState('')
 
-  const availableProducts = products.filter(p => (parseFloat(p.weight) || 0) > 0)
+  const availableProducts = products.filter(p => (parseFloat(p.weight) || 0) > 0 && (parseInt(p.quantity) || 0) > 0)
 
-  // Get unique categories for filter
+  // Get unique filter options
   const categories = [...new Set(availableProducts.map(p => p.category).filter(Boolean))]
 
-  // Filter products based on search query and selected category
+  const subcategories = [...new Set(availableProducts
+    .filter(p => !selectedCategory || p.category === selectedCategory)
+    .map(p => p.subcategory)
+    .filter(Boolean))]
+
+  const detailsList = [...new Set(availableProducts
+    .filter(p => (!selectedCategory || p.category === selectedCategory) && (!selectedSubcategory || p.subcategory === selectedSubcategory))
+    .map(p => p.detail)
+    .filter(Boolean))]
+
+  // Filter products based on search query and selected filters
   const filteredProducts = availableProducts.filter(p => {
     const matchesCategory = selectedCategory ? p.category === selectedCategory : true
+    const matchesSubcategory = selectedSubcategory ? p.subcategory === selectedSubcategory : true
+    const matchesDetail = selectedDetail ? p.detail === selectedDetail : true
     
     const term = searchQuery.toLowerCase()
     const matchesSearch = term ? (
@@ -22,7 +36,7 @@ const StockDashboard = ({ products = [], onDelete, role = 'admin' }) => {
       (p.detail || '').toLowerCase().includes(term)
     ) : true
 
-    return matchesCategory && matchesSearch
+    return matchesCategory && matchesSubcategory && matchesDetail && matchesSearch
   })
 
   // Calculations for stats card
@@ -31,19 +45,29 @@ const StockDashboard = ({ products = [], onDelete, role = 'admin' }) => {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex-between mb-16">
+      <div className="flex-between mb-16" style={{ flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <h1 style={{ margin: 0 }}>இருப்பு விவரங்கள் (Stock List)</h1>
           <p className="text-sub" style={{ marginTop: '4px' }}>
             Live Stock · {filteredProducts.length} பதிவுகள் · மொத்த எண்ணிக்கை {totalQuantity} pcs · மொத்த எடை {totalWeight.toFixed(3)}g
           </p>
         </div>
+        {role === 'admin' && onClearAllStock && (
+          <button
+            className="btn"
+            style={{ background: 'rgba(239,68,68,0.12)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600 }}
+            onClick={onClearAllStock}
+            title="அனைத்து பழைய இருப்பு தரவுகளையும் நீக்கு"
+          >
+            <Trash2 size={16} /> அனைத்து இருப்பையும் நீக்கு (Clear All Stock)
+          </button>
+        )}
       </div>
 
       {/* Search and Filter Card */}
       <div className="card mb-16" style={{ padding: '16px' }}>
-        <div className="search-filter-belt">
-          <div className="search-input-wrap">
+        <div className="search-filter-belt" style={{ flexWrap: 'wrap', gap: '12px' }}>
+          <div className="search-input-wrap" style={{ flex: '1 1 240px' }}>
             <span className="search-icon">
               <Search size={16} />
             </span>
@@ -56,21 +80,57 @@ const StockDashboard = ({ products = [], onDelete, role = 'admin' }) => {
             />
           </div>
 
-          <div className="filter-select-wrap">
+          <div className="filter-select-wrap" style={{ flex: '1 1 180px' }}>
             <span className="filter-icon">
               <Filter size={16} />
             </span>
             <select
               value={selectedCategory}
-              onChange={e => setSelectedCategory(e.target.value)}
+              onChange={e => { setSelectedCategory(e.target.value); setSelectedSubcategory(''); setSelectedDetail(''); }}
               className="filter-select"
             >
-              <option value="">— அனைத்து பிரிவுகள் (All) —</option>
+              <option value="">— பிரிவு (All Categories) —</option>
               {categories.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
           </div>
+
+          {subcategories.length > 0 && (
+            <div className="filter-select-wrap" style={{ flex: '1 1 180px' }}>
+              <span className="filter-icon">
+                <Filter size={16} />
+              </span>
+              <select
+                value={selectedSubcategory}
+                onChange={e => { setSelectedSubcategory(e.target.value); setSelectedDetail(''); }}
+                className="filter-select"
+              >
+                <option value="">— துணைப் பிரிவு (All Subcategories) —</option>
+                {subcategories.map(sub => (
+                  <option key={sub} value={sub}>{sub}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {detailsList.length > 0 && (
+            <div className="filter-select-wrap" style={{ flex: '1 1 180px' }}>
+              <span className="filter-icon">
+                <Filter size={16} />
+              </span>
+              <select
+                value={selectedDetail}
+                onChange={e => setSelectedDetail(e.target.value)}
+                className="filter-select"
+              >
+                <option value="">— விவரம் (All Details) —</option>
+                {detailsList.map(det => (
+                  <option key={det} value={det}>{det}</option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       </div>
 

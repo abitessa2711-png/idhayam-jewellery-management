@@ -12,8 +12,11 @@ const AddStock = ({ onAddProduct }) => {
   const [loading, setLoading] = useState(false)
   const [success, setLoadingSuccess] = useState(false)
 
-  const getSubs = () => formData.category ? Object.keys(MASTER_DATA[formData.category]) : []
-  
+  const getSubs = () => {
+    if (!formData.category) return []
+    return Object.keys(MASTER_DATA[formData.category]).filter(k => k !== 'விவரம்')
+  }
+
   const getVariants = () => {
     if (!formData.category || !formData.subcategory) return []
     const d = MASTER_DATA[formData.category][formData.subcategory]
@@ -21,8 +24,8 @@ const AddStock = ({ onAddProduct }) => {
   }
 
   const getDetails = () => {
-    if (formData.category === 'கொலுசு' && formData.variant && MASTER_DATA['கொலுசு']['விவரம்']?.[formData.variant]) {
-      return MASTER_DATA['கொலுசு']['விவரம்'][formData.variant] || []
+    if (formData.category === 'கொலுசு' && formData.variant) {
+      return MASTER_DATA['கொலுசு']['விவரம்']?.[formData.variant] || []
     }
     return []
   }
