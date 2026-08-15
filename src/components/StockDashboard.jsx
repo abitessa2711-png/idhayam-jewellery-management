@@ -20,7 +20,7 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
   const detailsList = [...new Set(availableProducts
     .filter(p => (!selectedCategory || p.category === selectedCategory) && (!selectedSubcategory || p.subcategory === selectedSubcategory))
     .map(p => p.detail)
-    .filter(Boolean))]
+    .filter(d => d && typeof d === 'string' && !d.includes('#')))]
 
   // Filter products based on search query and selected filters
   const filteredProducts = availableProducts.filter(p => {
@@ -187,13 +187,13 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
                         <div className="show-mobile" style={{ fontSize: '11px', color: 'var(--gold)', fontWeight: 'normal', marginTop: '2px' }}>
                           {item.category}
                         </div>
-                        {item.detail && (
+                        {item.detail && !item.detail.includes('#') && (
                           <div className="show-mobile" style={{ fontSize: '11px', color: 'var(--text-sub)', fontWeight: 'normal', marginTop: '2px' }}>
                             {item.detail}
                           </div>
                         )}
                       </td>
-                      <td className="hide-mobile" style={{ color: 'var(--text-sub)' }}>{item.detail || '—'}</td>
+                      <td className="hide-mobile" style={{ color: 'var(--text-sub)' }}>{item.detail && !item.detail.includes('#') ? item.detail : '—'}</td>
                       <td style={{ textAlign: 'right', fontWeight: 500 }}>
                         {parseFloat(item.weight || 0).toFixed(3)}
                       </td>
