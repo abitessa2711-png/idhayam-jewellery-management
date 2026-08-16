@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Trash2, Search, Filter } from 'lucide-react'
+import { Trash2, Search, Filter, RotateCcw } from 'lucide-react'
 
 const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admin' }) => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -10,13 +10,33 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
 
   const availableProducts = products.filter(p => (parseFloat(p.weight) || 0) > 0 && (parseInt(p.quantity) || 0) > 0)
 
-  // Get unique filter options across all available stock
-  const categories = [...new Set(availableProducts.map(p => p.category).filter(Boolean))]
-  const subcategories = [...new Set(availableProducts.map(p => p.subcategory).filter(Boolean))]
-  const variants = [...new Set(availableProducts.map(p => p.variant).filter(Boolean))]
-  const detailsList = [...new Set(availableProducts.map(p => p.detail).filter(d => d && typeof d === 'string' && !d.includes('#')))]
+  // 1. Category Options (across all stock)
+  const categories = [...new Set(availableProducts.map(p => p.category).filter(Boolean))].sort()
 
-  // Smart handlers for filter changes that auto-sync parent dropdowns
+  // 2. Subcategory Options (filtered by selected Category)
+  const subcategorySource = selectedCategory 
+    ? availableProducts.filter(p => p.category === selectedCategory) 
+    : availableProducts
+  const subcategories = [...new Set(subcategorySource.map(p => p.subcategory).filter(Boolean))].sort()
+
+  // 3. Variant / Model Options (filtered by selected Category & Subcategory)
+  const variantSource = availableProducts.filter(p => {
+    const matchCat = selectedCategory ? p.category === selectedCategory : true
+    const matchSub = selectedSubcategory ? p.subcategory === selectedSubcategory : true
+    return matchCat && matchSub
+  })
+  const variants = [...new Set(variantSource.map(p => p.variant).filter(Boolean))].sort()
+
+  // 4. Detail Options (filtered by selected Category, Subcategory, & Variant)
+  const detailSource = availableProducts.filter(p => {
+    const matchCat = selectedCategory ? p.category === selectedCategory : true
+    const matchSub = selectedSubcategory ? p.subcategory === selectedSubcategory : true
+    const matchVar = selectedVariant ? p.variant === selectedVariant : true
+    return matchCat && matchSub && matchVar
+  })
+  const detailsList = [...new Set(detailSource.map(p => p.detail).filter(d => d && typeof d === 'string' && !d.includes('#')))].sort()
+
+  // Clean, cascading change handlers
   const handleCategoryChange = (cat) => {
     setSelectedCategory(cat)
     setSelectedSubcategory('')
@@ -28,23 +48,22 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
     setSelectedSubcategory(sub)
     setSelectedVariant('')
     setSelectedDetail('')
-    if (sub) {
-      const match = availableProducts.find(p => p.subcategory === sub)
-      if (match && match.category) setSelectedCategory(match.category)
-    }
   }
 
   const handleVariantChange = (varName) => {
     setSelectedVariant(varName)
     setSelectedDetail('')
-    if (varName) {
-      const match = availableProducts.find(p => p.variant === varName)
-      if (match) {
-        if (match.category) setSelectedCategory(match.category)
-        if (match.subcategory) setSelectedSubcategory(match.subcategory)
-      }
-    }
   }
+
+  const handleClearFilters = () => {
+    setSearchQuery('')
+    setSelectedCategory('')
+    setSelectedSubcategory('')
+    setSelectedVariant('')
+    setSelectedDetail('')
+  }
+
+  const hasActiveFilters = searchQuery || selectedCategory || selectedSubcategory || selectedVariant || selectedDetail
 
   // Filter products based on search query and selected filters
   const filteredProducts = availableProducts.filter(p => {
@@ -53,7 +72,7 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
     const matchesVariant = selectedVariant ? p.variant === selectedVariant : true
     const matchesDetail = selectedDetail ? p.detail === selectedDetail : true
     
-    const term = searchQuery.toLowerCase()
+    const term = searchQuery.toLowerCase().trim()
     const matchesSearch = term ? (
       (p.category || '').toLowerCase().includes(term) ||
       (p.subcategory || '').toLowerCase().includes(term) ||
@@ -77,25 +96,34 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
             Live Stock · {filteredProducts.length} பதிவுகள் · மொத்த எண்ணிக்கை {totalQuantity} pcs · மொத்த எடை {totalWeight.toFixed(3)}g
           </p>
         </div>
+        {hasActiveFilters && (
+          <button 
+            className="btn btn-ghost" 
+            onClick={handleClearFilters}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: 'var(--text-sub)' }}
+          >
+            <RotateCcw size={14} /> வடிகட்டிகளை நீக்கு (Clear Filters)
+          </button>
+        )}
       </div>
 
       {/* Search and Filter Card */}
       <div className="card mb-16" style={{ padding: '16px' }}>
-        <div className="search-filter-belt" style={{ flexWrap: 'wrap', gap: '12px' }}>
-          <div className="search-input-wrap" style={{ flex: '1 1 220px' }}>
+        <div className="search-filter-belt" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
+          <div className="search-input-wrap" style={{ flex: '1 1 220px', minWidth: '180px' }}>
             <span className="search-icon">
               <Search size={16} />
             </span>
             <input
               type="text"
-              placeholder="மாடல், அளவு அல்லது விவரம் மூலம் தேடுங்கள்..."
+              placeholder="தேடுங்கள் (Search)..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               className="search-input"
             />
           </div>
 
-          <div className="filter-select-wrap" style={{ flex: '1 1 160px' }}>
+          <div className="filter-select-wrap" style={{ flex: '1 1 150px', minWidth: '130px' }}>
             <span className="filter-icon">
               <Filter size={16} />
             </span>
@@ -104,14 +132,14 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
               onChange={e => handleCategoryChange(e.target.value)}
               className="filter-select"
             >
-              <option value="">— பிரிவு (All Categories) —</option>
+              <option value="">— பிரிவு (Category) —</option>
               {categories.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
           </div>
 
-          <div className="filter-select-wrap" style={{ flex: '1 1 160px' }}>
+          <div className="filter-select-wrap" style={{ flex: '1 1 150px', minWidth: '130px' }}>
             <span className="filter-icon">
               <Filter size={16} />
             </span>
@@ -127,7 +155,7 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
             </select>
           </div>
 
-          <div className="filter-select-wrap" style={{ flex: '1 1 160px' }}>
+          <div className="filter-select-wrap" style={{ flex: '1 1 150px', minWidth: '130px' }}>
             <span className="filter-icon">
               <Filter size={16} />
             </span>
@@ -144,7 +172,7 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
           </div>
 
           {detailsList.length > 0 && (
-            <div className="filter-select-wrap" style={{ flex: '1 1 160px' }}>
+            <div className="filter-select-wrap" style={{ flex: '1 1 150px', minWidth: '130px' }}>
               <span className="filter-icon">
                 <Filter size={16} />
               </span>
