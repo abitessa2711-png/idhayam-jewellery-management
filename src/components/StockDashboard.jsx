@@ -19,16 +19,53 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
     .filter(Boolean))]
 
   const variants = [...new Set(availableProducts
-    .filter(p => (!selectedCategory || p.category === selectedCategory) && (!selectedSubcategory || p.subcategory === selectedSubcategory))
+    .filter(p => {
+      const matchCat = !selectedCategory || p.category === selectedCategory
+      const matchSub = !selectedSubcategory || p.subcategory === selectedSubcategory
+      return matchCat && matchSub
+    })
     .map(p => p.variant)
     .filter(Boolean))]
 
   const detailsList = [...new Set(availableProducts
-    .filter(p => (!selectedCategory || p.category === selectedCategory) && 
-                 (!selectedSubcategory || p.subcategory === selectedSubcategory) &&
-                 (!selectedVariant || p.variant === selectedVariant))
+    .filter(p => {
+      const matchCat = !selectedCategory || p.category === selectedCategory
+      const matchSub = !selectedSubcategory || p.subcategory === selectedSubcategory
+      const matchVar = !selectedVariant || p.variant === selectedVariant
+      return matchCat && matchSub && matchVar
+    })
     .map(p => p.detail)
     .filter(d => d && typeof d === 'string' && !d.includes('#')))]
+
+  // Smart handlers for filter changes that auto-sync parent dropdowns
+  const handleCategoryChange = (cat) => {
+    setSelectedCategory(cat)
+    setSelectedSubcategory('')
+    setSelectedVariant('')
+    setSelectedDetail('')
+  }
+
+  const handleSubcategoryChange = (sub) => {
+    setSelectedSubcategory(sub)
+    setSelectedVariant('')
+    setSelectedDetail('')
+    if (sub && !selectedCategory) {
+      const match = availableProducts.find(p => p.subcategory === sub)
+      if (match && match.category) setSelectedCategory(match.category)
+    }
+  }
+
+  const handleVariantChange = (varName) => {
+    setSelectedVariant(varName)
+    setSelectedDetail('')
+    if (varName) {
+      const match = availableProducts.find(p => p.variant === varName)
+      if (match) {
+        if (match.category && !selectedCategory) setSelectedCategory(match.category)
+        if (match.subcategory && !selectedSubcategory) setSelectedSubcategory(match.subcategory)
+      }
+    }
+  }
 
   // Filter products based on search query and selected filters
   const filteredProducts = availableProducts.filter(p => {
@@ -85,7 +122,7 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
             </span>
             <select
               value={selectedCategory}
-              onChange={e => { setSelectedCategory(e.target.value); setSelectedSubcategory(''); setSelectedVariant(''); setSelectedDetail(''); }}
+              onChange={e => handleCategoryChange(e.target.value)}
               className="filter-select"
             >
               <option value="">— பிரிவு (All Categories) —</option>
@@ -95,41 +132,37 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
             </select>
           </div>
 
-          {subcategories.length > 0 && (
-            <div className="filter-select-wrap" style={{ flex: '1 1 160px' }}>
-              <span className="filter-icon">
-                <Filter size={16} />
-              </span>
-              <select
-                value={selectedSubcategory}
-                onChange={e => { setSelectedSubcategory(e.target.value); setSelectedVariant(''); setSelectedDetail(''); }}
-                className="filter-select"
-              >
-                <option value="">— துணைப் பிரிவு (Subcategory) —</option>
-                {subcategories.map(sub => (
-                  <option key={sub} value={sub}>{sub}</option>
-                ))}
-              </select>
-            </div>
-          )}
+          <div className="filter-select-wrap" style={{ flex: '1 1 160px' }}>
+            <span className="filter-icon">
+              <Filter size={16} />
+            </span>
+            <select
+              value={selectedSubcategory}
+              onChange={e => handleSubcategoryChange(e.target.value)}
+              className="filter-select"
+            >
+              <option value="">— துணைப் பிரிவு (Subcategory) —</option>
+              {subcategories.map(sub => (
+                <option key={sub} value={sub}>{sub}</option>
+              ))}
+            </select>
+          </div>
 
-          {variants.length > 0 && (
-            <div className="filter-select-wrap" style={{ flex: '1 1 160px' }}>
-              <span className="filter-icon">
-                <Filter size={16} />
-              </span>
-              <select
-                value={selectedVariant}
-                onChange={e => { setSelectedVariant(e.target.value); setSelectedDetail(''); }}
-                className="filter-select"
-              >
-                <option value="">— மாடல் / ரகம் (Variant) —</option>
-                {variants.map(v => (
-                  <option key={v} value={v}>{v}</option>
-                ))}
-              </select>
-            </div>
-          )}
+          <div className="filter-select-wrap" style={{ flex: '1 1 160px' }}>
+            <span className="filter-icon">
+              <Filter size={16} />
+            </span>
+            <select
+              value={selectedVariant}
+              onChange={e => handleVariantChange(e.target.value)}
+              className="filter-select"
+            >
+              <option value="">— மாடல் / ரகம் (Variant) —</option>
+              {variants.map(v => (
+                <option key={v} value={v}>{v}</option>
+              ))}
+            </select>
+          </div>
 
           {detailsList.length > 0 && (
             <div className="filter-select-wrap" style={{ flex: '1 1 160px' }}>
