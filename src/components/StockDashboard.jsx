@@ -10,32 +10,11 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
 
   const availableProducts = products.filter(p => (parseFloat(p.weight) || 0) > 0 && (parseInt(p.quantity) || 0) > 0)
 
-  // Get unique filter options
+  // Get unique filter options across all available stock
   const categories = [...new Set(availableProducts.map(p => p.category).filter(Boolean))]
-
-  const subcategories = [...new Set(availableProducts
-    .filter(p => !selectedCategory || p.category === selectedCategory)
-    .map(p => p.subcategory)
-    .filter(Boolean))]
-
-  const variants = [...new Set(availableProducts
-    .filter(p => {
-      const matchCat = !selectedCategory || p.category === selectedCategory
-      const matchSub = !selectedSubcategory || p.subcategory === selectedSubcategory
-      return matchCat && matchSub
-    })
-    .map(p => p.variant)
-    .filter(Boolean))]
-
-  const detailsList = [...new Set(availableProducts
-    .filter(p => {
-      const matchCat = !selectedCategory || p.category === selectedCategory
-      const matchSub = !selectedSubcategory || p.subcategory === selectedSubcategory
-      const matchVar = !selectedVariant || p.variant === selectedVariant
-      return matchCat && matchSub && matchVar
-    })
-    .map(p => p.detail)
-    .filter(d => d && typeof d === 'string' && !d.includes('#')))]
+  const subcategories = [...new Set(availableProducts.map(p => p.subcategory).filter(Boolean))]
+  const variants = [...new Set(availableProducts.map(p => p.variant).filter(Boolean))]
+  const detailsList = [...new Set(availableProducts.map(p => p.detail).filter(d => d && typeof d === 'string' && !d.includes('#')))]
 
   // Smart handlers for filter changes that auto-sync parent dropdowns
   const handleCategoryChange = (cat) => {
@@ -49,7 +28,7 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
     setSelectedSubcategory(sub)
     setSelectedVariant('')
     setSelectedDetail('')
-    if (sub && !selectedCategory) {
+    if (sub) {
       const match = availableProducts.find(p => p.subcategory === sub)
       if (match && match.category) setSelectedCategory(match.category)
     }
@@ -61,8 +40,8 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
     if (varName) {
       const match = availableProducts.find(p => p.variant === varName)
       if (match) {
-        if (match.category && !selectedCategory) setSelectedCategory(match.category)
-        if (match.subcategory && !selectedSubcategory) setSelectedSubcategory(match.subcategory)
+        if (match.category) setSelectedCategory(match.category)
+        if (match.subcategory) setSelectedSubcategory(match.subcategory)
       }
     }
   }

@@ -459,12 +459,99 @@ export default function App() {
   }
 
   const deleteSale = async (id) => {
-    const { error } = await supabase.from('sales').delete().eq('id', id)
-    if (error) {
-      console.error("Error deleting sale:", error)
-      alert("விற்பனைப் பதிவை நீக்குவதில் பிழை: " + error.message)
-    } else {
-      setSoldItems(prev => prev.filter(item => item.id !== id))
+    try {
+      // 1. Fetch sale entry to be deleted
+      const { data: sale, error: fetchErr } = await supabase
+        .from('sales')
+        .select('*')
+        .eq('id', id)
+        .single()
+
+      if (fetchErr || !sale) {
+        throw new Error('விற்பனைப் பதிவு கண்டறியப்படவில்லை (Sale entry not found)')
+      }
+
+      // 2. Lookup Category ID
+      let category = dbCategories.find(c => c.name === sale.category)
+      if (!category) {
+        const { data: cData } = await supabase.from('categories').select('*').eq('name', sale.category).maybeSingle()
+        category = cData
+      }
+
+      // 3. Lookup Subcategory ID
+      let subcategory = null
+      if (sale.subcategory && category) {
+        subcategory = dbSubcategories.find(s => s.name === sale.subcategory && s.category_id === category.id)
+        if (!subcategory) {
+          const { data: sData } = await supabase.from('subcategories').select('*').eq('category_id', category.id).eq('name', sale.subcategory).maybeSingle()
+          subcategory = sData
+        }
+      }
+
+      // 4. Lookup Variant ID
+      let variant = null
+      if (sale.variant && category) {
+        variant = dbVariants.find(v => v.name === sale.variant && v.category_id === category.id && v.subcategory_id === (subcategory?.id || null))
+        if (!variant) {
+          const { data: vData } = await supabase.from('variants').select('*').eq('category_id', category.id).eq('subcategory_id', subcategory?.id || null).eq('name', sale.variant).maybeSingle()
+          variant = vData
+        }
+      }
+
+      const saleQty = parseInt(sale.quantity || 1)
+      const saleWt = parseFloat(sale.weight || 0)
+
+      // 5. Restore stock to stock_entries
+      if (category) {
+        const { data: existingStock } = await supabase
+          .from('stock_entries')
+          .select('*')
+          .eq('category_id', category.id)
+          .eq('subcategory_id', subcategory?.id || null)
+          .eq('variant_id', variant?.id || null)
+          .eq('detail', sale.detail || '')
+          .eq('weight', saleWt)
+
+        if (existingStock && existingStock.length > 0) {
+          // Update existing stock entry quantity
+          const currentEntry = existingStock[0]
+          const updatedQty = parseInt(currentEntry.quantity || 0) + saleQty
+          await supabase
+            .from('stock_entries')
+            .update({ quantity: updatedQty })
+            .eq('id', currentEntry.id)
+        } else {
+          // Insert new stock entry back into live stock
+          await supabase.from('stock_entries').insert({
+            category_id: category.id,
+            subcategory_id: subcategory?.id || null,
+            variant_id: variant?.id || null,
+            detail: sale.detail || '',
+            weight: saleWt,
+            quantity: saleQty
+          })
+        }
+      }
+
+      // 6. Delete sale entry from sales table
+      const { error: delErr } = await supabase.from('sales').delete().eq('id', id)
+      if (delErr) throw delErr
+
+      // 7. Log ledger entry
+      await supabase.from('ledger').insert({
+        type: 'ADD',
+        category_name: sale.category,
+        subcategory_name: sale.subcategory || null,
+        variant_name: sale.variant || null,
+        weight: saleWt
+      })
+
+      // 8. Refresh live stock & sales state
+      await loadData()
+      alert("விற்பனைப் பதிவு நீக்கப்பட்டு, அந்த நகை மீண்டும் இருப்புச் சரக்கில் (Live Stock) வெற்றிகரமாகச் சேர்க்கப்பட்டது! (Sale deleted and item restored to Live Stock successfully)")
+    } catch (err) {
+      console.error("Error deleting sale & restoring stock:", err)
+      alert("பிழை: " + err.message)
     }
   }
 
