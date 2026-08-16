@@ -5,6 +5,7 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [selectedSubcategory, setSelectedSubcategory] = useState('')
+  const [selectedVariant, setSelectedVariant] = useState('')
   const [selectedDetail, setSelectedDetail] = useState('')
 
   const availableProducts = products.filter(p => (parseFloat(p.weight) || 0) > 0 && (parseInt(p.quantity) || 0) > 0)
@@ -17,8 +18,15 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
     .map(p => p.subcategory)
     .filter(Boolean))]
 
-  const detailsList = [...new Set(availableProducts
+  const variants = [...new Set(availableProducts
     .filter(p => (!selectedCategory || p.category === selectedCategory) && (!selectedSubcategory || p.subcategory === selectedSubcategory))
+    .map(p => p.variant)
+    .filter(Boolean))]
+
+  const detailsList = [...new Set(availableProducts
+    .filter(p => (!selectedCategory || p.category === selectedCategory) && 
+                 (!selectedSubcategory || p.subcategory === selectedSubcategory) &&
+                 (!selectedVariant || p.variant === selectedVariant))
     .map(p => p.detail)
     .filter(d => d && typeof d === 'string' && !d.includes('#')))]
 
@@ -26,6 +34,7 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
   const filteredProducts = availableProducts.filter(p => {
     const matchesCategory = selectedCategory ? p.category === selectedCategory : true
     const matchesSubcategory = selectedSubcategory ? p.subcategory === selectedSubcategory : true
+    const matchesVariant = selectedVariant ? p.variant === selectedVariant : true
     const matchesDetail = selectedDetail ? p.detail === selectedDetail : true
     
     const term = searchQuery.toLowerCase()
@@ -36,7 +45,7 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
       (p.detail || '').toLowerCase().includes(term)
     ) : true
 
-    return matchesCategory && matchesSubcategory && matchesDetail && matchesSearch
+    return matchesCategory && matchesSubcategory && matchesVariant && matchesDetail && matchesSearch
   })
 
   // Calculations for stats card
@@ -57,7 +66,7 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
       {/* Search and Filter Card */}
       <div className="card mb-16" style={{ padding: '16px' }}>
         <div className="search-filter-belt" style={{ flexWrap: 'wrap', gap: '12px' }}>
-          <div className="search-input-wrap" style={{ flex: '1 1 240px' }}>
+          <div className="search-input-wrap" style={{ flex: '1 1 220px' }}>
             <span className="search-icon">
               <Search size={16} />
             </span>
@@ -70,13 +79,13 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
             />
           </div>
 
-          <div className="filter-select-wrap" style={{ flex: '1 1 180px' }}>
+          <div className="filter-select-wrap" style={{ flex: '1 1 160px' }}>
             <span className="filter-icon">
               <Filter size={16} />
             </span>
             <select
               value={selectedCategory}
-              onChange={e => { setSelectedCategory(e.target.value); setSelectedSubcategory(''); setSelectedDetail(''); }}
+              onChange={e => { setSelectedCategory(e.target.value); setSelectedSubcategory(''); setSelectedVariant(''); setSelectedDetail(''); }}
               className="filter-select"
             >
               <option value="">— பிரிவு (All Categories) —</option>
@@ -87,16 +96,16 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
           </div>
 
           {subcategories.length > 0 && (
-            <div className="filter-select-wrap" style={{ flex: '1 1 180px' }}>
+            <div className="filter-select-wrap" style={{ flex: '1 1 160px' }}>
               <span className="filter-icon">
                 <Filter size={16} />
               </span>
               <select
                 value={selectedSubcategory}
-                onChange={e => { setSelectedSubcategory(e.target.value); setSelectedDetail(''); }}
+                onChange={e => { setSelectedSubcategory(e.target.value); setSelectedVariant(''); setSelectedDetail(''); }}
                 className="filter-select"
               >
-                <option value="">— துணைப் பிரிவு (All Subcategories) —</option>
+                <option value="">— துணைப் பிரிவு (Subcategory) —</option>
                 {subcategories.map(sub => (
                   <option key={sub} value={sub}>{sub}</option>
                 ))}
@@ -104,8 +113,26 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
             </div>
           )}
 
+          {variants.length > 0 && (
+            <div className="filter-select-wrap" style={{ flex: '1 1 160px' }}>
+              <span className="filter-icon">
+                <Filter size={16} />
+              </span>
+              <select
+                value={selectedVariant}
+                onChange={e => { setSelectedVariant(e.target.value); setSelectedDetail(''); }}
+                className="filter-select"
+              >
+                <option value="">— மாடல் / ரகம் (Variant) —</option>
+                {variants.map(v => (
+                  <option key={v} value={v}>{v}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {detailsList.length > 0 && (
-            <div className="filter-select-wrap" style={{ flex: '1 1 180px' }}>
+            <div className="filter-select-wrap" style={{ flex: '1 1 160px' }}>
               <span className="filter-icon">
                 <Filter size={16} />
               </span>
@@ -114,7 +141,7 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
                 onChange={e => setSelectedDetail(e.target.value)}
                 className="filter-select"
               >
-                <option value="">— விவரம் (All Details) —</option>
+                <option value="">— விவரம் (Detail) —</option>
                 {detailsList.map(det => (
                   <option key={det} value={det}>{det}</option>
                 ))}
