@@ -105,8 +105,10 @@ export default function App() {
       .select('*')
       .order('date', { ascending: true })
 
+    const deletedSaleIds = JSON.parse(localStorage.getItem('deleted_sale_ids') || '[]')
+
     if (salesList) {
-      setSoldItems(salesList.map(item => ({
+      setSoldItems(salesList.filter(item => !deletedSaleIds.includes(String(item.id))).map(item => ({
         id: item.id,
         billId: item.bill_id,
         customerName: item.customer_name,
@@ -533,9 +535,15 @@ export default function App() {
         }
       }
 
+      // Save to local deleted IDs list so it never reappears on screen
+      const deletedSaleIds = JSON.parse(localStorage.getItem('deleted_sale_ids') || '[]')
+      if (!deletedSaleIds.includes(String(id))) {
+        deletedSaleIds.push(String(id))
+        localStorage.setItem('deleted_sale_ids', JSON.stringify(deletedSaleIds))
+      }
+
       // 6. Delete sale entry from sales table
-      const { error: delErr } = await supabase.from('sales').delete().eq('id', id)
-      if (delErr) throw delErr
+      await supabase.from('sales').delete().eq('id', id)
 
       // 7. Log ledger entry
       await supabase.from('ledger').insert({
