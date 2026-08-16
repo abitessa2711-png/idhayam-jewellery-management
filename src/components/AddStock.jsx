@@ -45,7 +45,7 @@ const AddStock = ({ onAddProduct }) => {
         variant: formData.variant,
         detail: formData.detail || "",
         weight: parseFloat(formData.weight || 0),
-        quantity: parseInt(formData.quantity || 0),
+        quantity: Math.max(1, parseInt(formData.quantity || 1)),
         customDate: new Date(formData.date).toISOString()
       })
       setFormData({ 
@@ -138,8 +138,8 @@ const AddStock = ({ onAddProduct }) => {
             <div className="form-group">
               <label>எடை (Weight g) *</label>
               <input 
-                type="number" step="0.001" min="0"
-                placeholder="0.000"
+                type="number" step="any" min="0"
+                placeholder="எகா: 71.820"
                 value={formData.weight}
                 onChange={e => setFormData({ ...formData, weight: e.target.value })}
                 required 
@@ -149,8 +149,8 @@ const AddStock = ({ onAddProduct }) => {
             <div className="form-group">
               <label>எண்ணிக்கை (Quantity pcs) *</label>
               <input 
-                type="number" min="0"
-                placeholder="0"
+                type="number" step="any" min="0"
+                placeholder="எகா: 1"
                 value={formData.quantity}
                 onChange={e => setFormData({ ...formData, quantity: e.target.value })}
                 required 
