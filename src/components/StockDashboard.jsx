@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Trash2, Search, Filter, RotateCcw } from 'lucide-react'
+import { MASTER_DATA } from '../data/masterData'
 
 const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admin' }) => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -25,7 +26,11 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
     const matchSub = selectedSubcategory ? p.subcategory === selectedSubcategory : true
     return matchCat && matchSub
   })
-  const variants = [...new Set(variantSource.map(p => p.variant).filter(Boolean))].sort()
+  const masterVariantsForCat = selectedCategory && MASTER_DATA[selectedCategory]
+    ? Object.values(MASTER_DATA[selectedCategory]).flat()
+    : []
+  const stockVariants = variantSource.map(p => p.variant).filter(Boolean)
+  const variants = [...new Set([...stockVariants, ...masterVariantsForCat])].sort()
 
   // 4. Detail Options (filtered by selected Category, Subcategory, & Variant)
   const detailSource = availableProducts.filter(p => {
