@@ -80,14 +80,33 @@ export default function App() {
     // 1. Fetch categories/subcategories/variants lookup
     await loadLookupTables()
 
-    // 2. Fetch products (stock entries)
-    const { data: stocks } = await supabase
-      .from('stock_entries')
-      .select('*, categories(name), subcategories(name), variants(name)')
-      .order('created_at', { ascending: true })
+    // 2. Fetch products (stock entries with pagination to bypass Supabase 1000 limit)
+    let allStocks = []
+    let fromIndex = 0
+    const pageSize = 1000
+    let hasMore = true
 
-    if (stocks) {
-      setProducts(stocks.map(item => ({
+    while (hasMore) {
+      const { data: pageData, error } = await supabase
+        .from('stock_entries')
+        .select('*, categories(name), subcategories(name), variants(name)')
+        .range(fromIndex, fromIndex + pageSize - 1)
+        .order('created_at', { ascending: true })
+
+      if (error || !pageData || pageData.length === 0) {
+        hasMore = false
+      } else {
+        allStocks = allStocks.concat(pageData)
+        if (pageData.length < pageSize) {
+          hasMore = false
+        } else {
+          fromIndex += pageSize
+        }
+      }
+    }
+
+    if (allStocks.length > 0) {
+      setProducts(allStocks.map(item => ({
         id: item.id,
         category: item.categories?.name || '',
         subcategory: item.subcategories?.name || '',

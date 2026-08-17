@@ -8,39 +8,29 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey)
 async function checkGrandSummary() {
   const { data: entries } = await supabase
     .from('stock_entries')
-    .select(`
-      id,
-      weight,
-      quantity,
-      detail,
-      categories (name),
-      subcategories (name),
-      variants (name)
-    `)
+    .select('*, categories(name)')
+    .range(0, 9999)
 
+  const catSummary = {}
   let totalPcs = 0
   let totalWt = 0
 
-  const catGrouped = {}
-
   entries.forEach(e => {
-    const qty = parseInt(e.quantity || 1)
-    const wt = parseFloat(e.weight || 0) * qty
-    const cat = e.categories?.name || 'மற்றவை'
+    const catName = e.categories?.name || 'Uncategorized'
+    const q = parseInt(e.quantity) || 1
+    const w = (parseFloat(e.weight) || 0) * q
 
-    if (qty > 0 && wt > 0) {
-      totalPcs += qty
-      totalWt += wt
+    if (!catSummary[catName]) catSummary[catName] = { pcs: 0, wt: 0 }
+    catSummary[catName].pcs += q
+    catSummary[catName].wt += w
 
-      if (!catGrouped[cat]) catGrouped[cat] = { pcs: 0, wt: 0 }
-      catGrouped[cat].pcs += qty
-      catGrouped[cat].wt += wt
-    }
+    totalPcs += q
+    totalWt += w
   })
 
-  console.log("=== NEW LIVE STOCK CATEGORY TOTALS ===")
-  Object.keys(catGrouped).forEach(cat => {
-    console.log(`${cat}: ${catGrouped[cat].pcs} Pcs | ${catGrouped[cat].wt.toFixed(3)}g`)
+  console.log("=== NEW LIVE STOCK CATEGORY TOTALS (WITH RANGE 0-9999) ===")
+  Object.keys(catSummary).forEach(c => {
+    console.log(`${c}: ${catSummary[c].pcs} Pcs | ${catSummary[c].wt.toFixed(3)}g`)
   })
 
   console.log(`\nUPDATED GRAND TOTAL: ${totalPcs} Pcs | ${totalWt.toFixed(3)}g (~${(totalWt/1000).toFixed(2)} kg)`)
