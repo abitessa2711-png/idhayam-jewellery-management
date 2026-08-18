@@ -26,10 +26,23 @@ const StockDashboard = ({ products = [], onDelete, onClearAllStock, role = 'admi
     const matchSub = selectedSubcategory ? p.subcategory === selectedSubcategory : true
     return matchCat && matchSub
   })
-  const masterVariantsForCat = selectedCategory && MASTER_DATA[selectedCategory]
-    ? Object.values(MASTER_DATA[selectedCategory]).flat()
-    : []
-  const stockVariants = variantSource.map(p => p.variant).filter(Boolean)
+
+  const getFlatMasterVariants = (cat) => {
+    if (!cat || !MASTER_DATA[cat]) return []
+    const catData = MASTER_DATA[cat]
+    const list = []
+    Object.values(catData).forEach(val => {
+      if (Array.isArray(val)) {
+        val.forEach(v => { if (typeof v === 'string') list.push(v) })
+      } else if (typeof val === 'string') {
+        list.push(val)
+      }
+    })
+    return list
+  }
+
+  const masterVariantsForCat = getFlatMasterVariants(selectedCategory)
+  const stockVariants = variantSource.map(p => p.variant).filter(v => v && typeof v === 'string')
   const variants = [...new Set([...stockVariants, ...masterVariantsForCat])].sort()
 
   // 4. Detail Options (filtered by selected Category, Subcategory, & Variant)
