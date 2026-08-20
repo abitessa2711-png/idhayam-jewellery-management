@@ -118,16 +118,28 @@ export default function App() {
       })))
     }
 
-    // 3. Fetch sales history (Sales Module)
-    const { data: salesList } = await supabase
-      .from('sales')
-      .select('*')
-      .order('date', { ascending: true })
+    // 3. Fetch sales history (Sales Module with pagination)
+    let allSales = []
+    let salesFrom = 0
+    let salesHasMore = true
+    while (salesHasMore) {
+      const { data: salesPage, error } = await supabase
+        .from('sales')
+        .select('*')
+        .range(salesFrom, salesFrom + pageSize - 1)
+        .order('date', { ascending: true })
 
-    const deletedSaleIds = JSON.parse(localStorage.getItem('deleted_sale_ids') || '[]')
+      if (error || !salesPage || salesPage.length === 0) {
+        salesHasMore = false
+      } else {
+        allSales = allSales.concat(salesPage)
+        if (salesPage.length < pageSize) salesHasMore = false
+        else salesFrom += pageSize
+      }
+    }
 
-    if (salesList) {
-      setSoldItems(salesList.filter(item => !deletedSaleIds.includes(String(item.id))).map(item => ({
+    if (allSales) {
+      setSoldItems(allSales.map(item => ({
         id: item.id,
         billId: item.bill_id,
         customerName: item.customer_name,
@@ -145,24 +157,53 @@ export default function App() {
       })))
     }
 
-    // 4. Fetch ledger
-    const { data: ledgerList } = await supabase
-      .from('ledger')
-      .select('*')
-      .order('created_at', { ascending: false })
+    // 4. Fetch ledger (with pagination)
+    let allLedger = []
+    let ledgerFrom = 0
+    let ledgerHasMore = true
+    while (ledgerHasMore) {
+      const { data: ledgerPage, error } = await supabase
+        .from('ledger')
+        .select('*')
+        .range(ledgerFrom, ledgerFrom + pageSize - 1)
+        .order('created_at', { ascending: false })
 
-    if (ledgerList) {
-      setLedger(ledgerList)
+      if (error || !ledgerPage || ledgerPage.length === 0) {
+        ledgerHasMore = false
+      } else {
+        allLedger = allLedger.concat(ledgerPage)
+        if (ledgerPage.length < pageSize) ledgerHasMore = false
+        else ledgerFrom += pageSize
+      }
     }
 
-    const { data: buybackList } = await supabase
-      .from('purchases')
-      .select('*')
-      .eq('category', 'Old Item')
-      .order('date', { ascending: false })
+    if (allLedger) {
+      setLedger(allLedger)
+    }
 
-    if (buybackList) {
-      setBuybacks(buybackList.map(item => ({
+    // 5. Fetch purchases/old buyback (with pagination)
+    let allBuybacks = []
+    let buyFrom = 0
+    let buyHasMore = true
+    while (buyHasMore) {
+      const { data: buyPage, error } = await supabase
+        .from('purchases')
+        .select('*')
+        .eq('category', 'Old Item')
+        .range(buyFrom, buyFrom + pageSize - 1)
+        .order('date', { ascending: false })
+
+      if (error || !buyPage || buyPage.length === 0) {
+        buyHasMore = false
+      } else {
+        allBuybacks = allBuybacks.concat(buyPage)
+        if (buyPage.length < pageSize) buyHasMore = false
+        else buyFrom += pageSize
+      }
+    }
+
+    if (allBuybacks) {
+      setBuybacks(allBuybacks.map(item => ({
         id: item.id,
         date: item.date,
         itemName: item.variant,
@@ -554,15 +595,11 @@ export default function App() {
         }
       }
 
-      // Save to local deleted IDs list so it never reappears on screen
-      const deletedSaleIds = JSON.parse(localStorage.getItem('deleted_sale_ids') || '[]')
-      if (!deletedSaleIds.includes(String(id))) {
-        deletedSaleIds.push(String(id))
-        localStorage.setItem('deleted_sale_ids', JSON.stringify(deletedSaleIds))
+      // 6. Delete sale entry permanently from sales table
+      const { error: deleteErr } = await supabase.from('sales').delete().eq('id', id)
+      if (deleteErr) {
+        throw new Error('விற்பனைப் பதிவை நீக்குவதில் பிழை (Failed to delete sale): ' + deleteErr.message)
       }
-
-      // 6. Delete sale entry from sales table
-      await supabase.from('sales').delete().eq('id', id)
 
       // 7. Log ledger entry
       await supabase.from('ledger').insert({
