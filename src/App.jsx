@@ -596,9 +596,12 @@ export default function App() {
       }
 
       // 6. Delete sale entry permanently from sales table
-      const { error: deleteErr } = await supabase.from('sales').delete().eq('id', id)
+      const { data: delResult, error: deleteErr } = await supabase.from('sales').delete().eq('id', id).select()
       if (deleteErr) {
         throw new Error('விற்பனைப் பதிவை நீக்குவதில் பிழை (Failed to delete sale): ' + deleteErr.message)
+      }
+      if (!delResult || delResult.length === 0) {
+        throw new Error('Supabase RLS Policy: விற்பனைப் பதிவை நீக்க அனுமதி இல்லை. Supabase SQL Editor-ல் `ALTER TABLE sales DISABLE ROW LEVEL SECURITY;` இயக்கவும்.')
       }
 
       // 7. Log ledger entry
